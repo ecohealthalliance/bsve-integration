@@ -28,7 +28,6 @@ export LOCAL_IP=$(ifconfig eth0|grep "inet addr"|awk -F":" '{print $2}'|awk '{pr
 wget https://raw.githubusercontent.com/ecohealthalliance/grits-deploy-ansible/master/compose.yml --output-document=grits.yml
 sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" grits.yml
 sed -i "/    \- \/mnt\/grits:\/home\/grits/d" grits.yml
-sed -i "/    \- \/opt\/grits\-deploy\-ansible:\/opt\/grits\-deploy-ansible/d" grits.yml
 sed -i "s/image: grits$/image: grits-provisioned/" grits.yml
 
 #Instantiate a new grits container
