@@ -35,6 +35,7 @@ docker-compose -f grits.yml up -d
 
 #Change all mongo references to use new local ip address
 docker exec -t grits find /var/lib/mongo/grits/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
+docker exec -t grits find /home/grits/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
 docker exec -t grits find /etc/supervisor/conf.d/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
 
 #Restart all the services
