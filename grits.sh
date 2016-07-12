@@ -21,10 +21,20 @@ fi
 
 docker load < grits-provisioned.tar
 
-#Get and configure docker compose file for grits
+#Get and setup config files
 export LOCAL_IP=$(ifconfig eth0|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 wget https://raw.githubusercontent.com/ecohealthalliance/grits-deploy-ansible/master/compose.yml --output-document=grits.yml
-sed -i "s/172.30.2.123/$LOCAL_IP/" grits.yml
+sed -i "s/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/$LOCAL_IP/" grits.yml
 sed -i "s/image: grits/image: grits-provisioned/" grits.yml
 
 docker-compose -f grits.yml up -d
+
+docker exec -t grits sed -i "s/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/$LOCAL_IP/" /var/lib/mongo/grits/grits-api/config.py
+docker exec -t grits sed -i "s/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/$LOCAL_IP/" /var/lib/mongo/grits/grits_config
+docker exec -t grits sed -i "s/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/$LOCAL_IP/" /etc/supervisor/conf.d/girderd.conf
+
+docker exec -t grits service supervisor restart
+
+echo "*****************************************************************************************"
+echo "Please update with your own bsve credentials at $GRITS_HOME/grits-api/config.py"
+echo "*****************************************************************************************"
