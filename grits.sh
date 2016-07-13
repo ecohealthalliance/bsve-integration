@@ -38,6 +38,7 @@ docker exec -t grits find /var/lib/mongo/grits/ -type f -exec sed -i -r "s/mongo
 docker exec -t grits find /home/grits/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
 docker exec -t grits find /etc/supervisor/conf.d/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
 docker exec -t grits sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b:27017/$LOCAL_IP:27017/" /home/grits/diagnostic-dashboard/.scripts/autocompleteCollections.js
+docker exec -t grits sed -i -r "s/ROOT_URL=\"http\:\/\/grits.eha.io\"/ROOT_URL=\"http\:\/\/$LOCAL_IP\"/" /etc/supervisor/conf.d/dashboardd.conf
 
 #Restart all the services
 docker kill grits
