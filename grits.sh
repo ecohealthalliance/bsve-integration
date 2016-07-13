@@ -37,6 +37,7 @@ docker-compose -f grits.yml up -d
 docker exec -t grits find /var/lib/mongo/grits/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
 docker exec -t grits find /home/grits/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
 docker exec -t grits find /etc/supervisor/conf.d/ -type f -exec sed -i -r "s/mongodb\:\/\/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b\:27017/mongodb\:\/\/$LOCAL_IP:27017/" {} \;
+docker exec -t grits sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b:27017/$LOCAL_IP:27017/" /home/grits/diagnostic-dashboard/.scripts/autocompleteCollections.js
 
 #Restart all the services
 docker kill grits
