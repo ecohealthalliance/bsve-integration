@@ -9,7 +9,7 @@ fi
 ./mongodb.sh
 
 #Import the geonames dataset
-mv -v ./geonames.tar /var/log
+ln -s ./geonames.tar /var/log/geonames.tar
 cd /var/log/ && tar -xf geonames.tar &&\ 
 docker exec -t mongodb mongorestore --db geonames /var/log/geonames
 
