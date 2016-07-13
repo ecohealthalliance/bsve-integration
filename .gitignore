@@ -4,4 +4,4 @@
 **/*.swo
 mongodb/*
 **/*.yml
-
+**/settings-production.json

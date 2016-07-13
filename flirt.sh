@@ -34,9 +34,9 @@ sed -i "/    \- \/shared\:\/shared\:ro/d" flirt.yml
 docker-compose -f flirt.yml up -d
 
 #Setup up the settings json file
-export JSON_STRING = {\n  "public": {\n     "analyticsSettings": {\n        "Google Analytics" : {"trackingId": "CHANGE-ME"}\n     }\n   }\n}
+echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json
 docker exec -t flirt mkdir /shared
-docker exec -t flirt echo $JSON_STRING > /shared/settings-production.json
+docker cp settings-production.json flirt:/shared/settings-production.json
 
 #Restart flirt
 docker kill flirt
