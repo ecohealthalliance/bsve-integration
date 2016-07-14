@@ -1,6 +1,14 @@
 #!/bin/bash
 
-./initial-checks.sh
+ethernet="eth0"
+
+if [[ $1 && $2 ]]; then
+  if [ "$1"=="--ethernet" ]; then
+    ethernet="$2"
+  fi
+fi
+
+./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Ensure data dump file is in our directory
 if [ ! -f geonames.tar ]; then
