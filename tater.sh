@@ -22,3 +22,25 @@ sed -i "s/8007/80/" tater.yml
 #Instantiate a new grits container
 docker-compose -f tater.yml up -d
 
+#Settings json file
+docker exec -t tater mkdir /shared
+echo "{  "public": {    "stripe": {      "publishableKey": "pk_live_CHANGEME"    },    "analyticsSettings": {      "Google Analytics" : {"trackingId": "UA-CHANGEME"}    },    "accounts": {      "tokenUser": "bsve-user@CHANGEME.org"    }  },  "private": {    "AWS_ACCESS_KEY": "CHANGEME",    "AWS_SECRET_KEY": "CHANGEME",    "stripe": {      "secretKey": "sk_live_CHANGEME"    },    "accounts": {      "loginToken": "CHANGEME"    },    "MAIL_URL":"smtp://CHANGEME",    "jenkins": {      "url": "CHANGEME",      "user": "CHANGEME",      "key": "CHANGEME",      "buildKey": "CHANGEME"    }  }}" > settings-production.json
+docker cp settings-production.json tater:/shared/settings-production.json
+
+echo "Step 1:"
+echo "***************************************************************************************"
+echo "Update /shared/settings-production.json with your appropriate values"
+echo "***************************************************************************************"
+echo "\n\n\n"
+echo "Step 2:"
+echo "***************************************************************************************"
+echo "Restart the tater container"
+echo "***************************************************************************************"
+echo "\n\n\n"
+echo "Step 3:"
+echo "***************************************************************************************"
+echo "To setup a default user for an empty database:"
+echo "In the browser console, run:"
+echo "Meteor.call('createDefaultUser', <your@email>)"
+echo "Then follow the link in the email that you should receive to set the password"
+echo "***************************************************************************************"
