@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./initial-checks.sh
+
 mkdir mongodb
 cd mongodb
 

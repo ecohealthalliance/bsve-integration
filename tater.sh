@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./initial-checks.sh
+
 #Build and spin up our mongodb
 ./mongodb.sh
 

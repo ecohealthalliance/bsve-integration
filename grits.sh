@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./initial-checks.sh
+
 #Ensure data dump file is in our directory
 if [ ! -f geonames.tar ]; then
   aws s3 cp s3://bsve-integration/geonames.tar ./geonames.tar
