@@ -27,8 +27,8 @@ docker-compose -f tater.yml up -d
 
 #Settings json file
 docker exec -t tater mkdir /shared
-echo '{  "public": {    "stripe": {      "publishableKey": "pk_live_CHANGEME"    },    "analyticsSettings": {      "Google Analytics" : {"trackingId": "UA-CHANGEME"}    },    "accounts": {      "tokenUser": "bsve-user@CHANGEME.org"    }  },  "private": {    "AWS_ACCESS_KEY": "CHANGEME",    "AWS_SECRET_KEY": "CHANGEME",    "stripe": {      "secretKey": "sk_live_CHANGEME"    },    "accounts": {      "loginToken": "CHANGEME"    },    "MAIL_URL":"smtp://CHANGEME",    "jenkins": {      "url": "CHANGEME",      "user": "CHANGEME",      "key": "CHANGEME",      "buildKey": "CHANGEME"    }  }}' > settings-production.json
-docker cp settings-production.json tater:/shared/settings-production.json
+wget https://raw.githubusercontent.com/ecohealthalliance/tater/master/settings-bsve.json
+docker cp settings-bsve.json tater:/shared/settings-production.json
 
 echo ""
 echo ""
