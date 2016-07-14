@@ -5,3 +5,5 @@
 mongodb/*
 **/*.yml
 **/settings-production.json
+**/settings-bsve.json
+
