@@ -7,4 +7,4 @@ fi
 
 docker --version || echo "Please install docker:   https://docs.docker.com/engine/installation/linux/"
 
-docker-compose docker-compose --version || echo "Please install docker-compose:   https://docs.docker.com/compose/install/"
+docker-compose --version || echo "Please install docker-compose:   https://docs.docker.com/compose/install/"
