@@ -8,3 +8,5 @@ fi
 docker --version || echo "Please install docker:   https://docs.docker.com/engine/installation/linux/"
 
 docker-compose --version || echo "Please install docker-compose:   https://docs.docker.com/compose/install/"
+
+aws s3 ls s3://bsve-integration || echo "Please install and configure awscli:   https://github.com/aws/aws-cli"
