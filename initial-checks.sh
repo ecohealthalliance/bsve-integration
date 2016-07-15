@@ -1,10 +1,17 @@
 #!/bin/bash
 
-uname -s | grep -i linux || (echo "Please run this script on Linux" && exit 1)
+check_for_failure () {
+  if [ $? -ne 0 ];then
+    echo $1
+    exit 1
+  fi
+}
+
+uname -s | grep -i linux
+check_for_failure "Please run this script on Linux"
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root or with sudo"
-  exit 1
+  check_for_failure "Please run as root or with sudo"
 fi
 
 ethernet="eth0"
@@ -15,11 +22,15 @@ if [[ $1 && $2 ]]; then
   fi
 fi
 
-ifconfig $ethernet || (echo "Ethernet interface named $ethernet not found. Please specify correct ethernet name with --ethernet <name>" && exit 1)
+ifconfig $ethernet
+check_for_failure "Ethernet interface named $ethernet not found. Please specify correct ethernet name with --ethernet <name>"
 
-docker --version || (echo "Please install docker:   https://docs.docker.com/engine/installation/linux/" && exit 1)
+docker --version
+check_for_failure "Please install docker:   https://docs.docker.com/engine/installation/linux/"
 
-docker-compose --version || (echo "Please install docker-compose:   https://docs.docker.com/compose/install/" && exit 1)
+docker-compose --version
+check_for_failure "Please install docker-compose:   https://docs.docker.com/compose/install/"
 
-aws s3 ls s3://bsve-integration || (echo "Please install and configure awscli:   https://github.com/aws/aws-cli" && echo "Make sure to have access to s3://bsve-integration too" && exit 1)
+aws s3 ls s3://bsve-integration
+check_for_failure "Please install and configure awscli:   https://github.com/aws/aws-cli\nMake sure to have access to s3://bsve-integration too"
 
