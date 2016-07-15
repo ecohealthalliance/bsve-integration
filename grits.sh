@@ -56,4 +56,6 @@ docker start grits
 
 echo "*****************************************************************************************"
 echo "Please update with your own bsve credentials at /home/grits/grits-api/config.py"
+echo "Afterwards please restart the container."
+echo "Grits app will be available at http://$LOCAL_IP/new?compact=true&bsveAccessKey=loremipsumhello714902&hideBackButton=true"
 echo "*****************************************************************************************"
