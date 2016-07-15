@@ -32,7 +32,7 @@ fi
 #Load the image
 docker load < flirt.tar
 
-export LOCAL_IP=$(ifconfig eth0|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
+export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 
 #Get and setup config files
 wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/containers/flirt.yml
