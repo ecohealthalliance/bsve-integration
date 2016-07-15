@@ -10,7 +10,7 @@ check_for_failure () {
 uname -s | grep -i linux
 check_for_failure "Please run this script on Linux"
 
-if [ "$EUID" -ne 0 ]
+if [ "$EUID" -ne 0 ];then
   check_for_failure "Please run as root or with sudo"
 fi
 
