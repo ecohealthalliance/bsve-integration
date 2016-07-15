@@ -16,7 +16,7 @@ if [ ! -f grits-net-meteor.tar ]; then
 fi
 
 #Build and spin up our mongodb
-./mongodb.sh
+./mongodb.sh --ethernet $ethernet
 
 #Import the grits-net-meteor dataset
 ln -s $(pwd)/grits-net-meteor.tar /var/log/grits-net-meteor.tar

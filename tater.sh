@@ -11,7 +11,7 @@ fi
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Build and spin up our mongodb
-./mongodb.sh
+./mongodb.sh --ethernet $ethernet
 
 #Ensure we have a copy of the grits image
 if [[ ! -f tater.tar.gz && ! -f tater.tar ]]; then

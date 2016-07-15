@@ -16,7 +16,7 @@ if [ ! -f geonames.tar ]; then
 fi
 
 #Build and spin up our mongodb
-./mongodb.sh
+./mongodb.sh --ethernet $ethernet
 
 #Import the geonames dataset
 ln -s $(pwd)/geonames.tar /var/log/geonames.tar
