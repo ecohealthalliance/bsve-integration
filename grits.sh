@@ -55,5 +55,5 @@ docker kill grits
 docker start grits
 
 echo "*****************************************************************************************"
-echo "Please update with your own bsve credentials at $GRITS_HOME/grits-api/config.py"
+echo "Please update with your own bsve credentials at /home/grits/grits-api/config.py"
 echo "*****************************************************************************************"
