@@ -55,3 +55,10 @@ docker start flirt
 echo "*****************************************************************************************"
 echo "Please update settings in /shared/settings-production.json"
 echo "*****************************************************************************************"
+echo ""
+echo ""
+echo ""
+echo "*****************************************************************************************"
+echo "Please also not that the app may take serveral minutes to load depending on the amount of data in the database"
+echo "*****************************************************************************************"
+
