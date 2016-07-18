@@ -11,8 +11,20 @@ uname -s | grep -i linux
 check_for_failure "Please run this script on Linux"
 
 if [ "$EUID" -ne 0 ];then
-  check_for_failure "Please run as root or with sudo"
+  echo "Please run as root or with sudo"
+  exit 1
 fi
+
+if [ $(free|grep Mem|awk '{print $2}') -lt "7500000" ];then
+  echo "At least 7.5GB of RAM is required"
+  exit 1
+fi
+
+if [ $(df --output=avail | tail -n +2 | awk '{s+=$1} END {printf "%.0f", s/1024/1024}') -lt "30" ];then
+  echo "At least 30GB of hard drive space is required"
+  exit 1
+fi
+
 
 ethernet="eth0"
 
