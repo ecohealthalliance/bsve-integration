@@ -23,7 +23,7 @@ ln -s $(pwd)/grits-net-meteor.tar /var/log/grits-net-meteor.tar
 cd /var/log/ && tar -xf grits-net-meteor.tar &&\ 
 docker exec -t mongodb mongorestore --db grits-net-meteor /var/log/grits-net-meteor
 
-#Ensure we have a copy of the grits image
+#Ensure we have a copy of the flirt image
 if [[ ! -f flirt.tar.gz && ! -f flirt.tar ]]; then
   aws s3 cp s3://bsve-integration/flirt.tar.gz ./flirt.tar.gz
   gzip -d flirt.tar.gz
@@ -40,7 +40,7 @@ sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" flirt.yml
 sed -i "/  volumes\:/d" flirt.yml
 sed -i "/    \- \/shared\:\/shared\:ro/d" flirt.yml
 
-#Instantiate a new grits container
+#Instantiate a new flirt container
 docker-compose -f flirt.yml up -d
 
 #Setup up the settings json file
