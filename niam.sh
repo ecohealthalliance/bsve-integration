@@ -29,6 +29,7 @@ fi
 virtuoso_data_path=/mnt/virtuoso
 if [[ ! -d $virtuoso_data_path/toLoad ]]; then
   mkdir -p $virtuoso_data_path/toLoad
+  #TODO: Update dump
   aws s3 cp --recursive s3://promed-database/sparql-annotation-database/virtuoso/dump_2016-07-15_15-27 $virtuoso_data_path/toLoad
 fi
 
