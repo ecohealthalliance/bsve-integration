@@ -52,7 +52,7 @@ sed -r "s/\{\{ip_address\}\}/$LOCAL_IP/" compose/spa.yml > /tmp/spa.yml
 docker-compose -f /tmp/spa.yml up -d
 
 #Run cron script for testing
-docker exec -ti promed-scraper bash ./cronjob.sh
+docker exec -ti promed-scraper bash cronjob.sh
 
 echo "*****************************************************************************************"
 echo "Please update settings in /shared/settings-production.json"
