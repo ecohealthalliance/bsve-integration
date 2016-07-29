@@ -46,3 +46,6 @@ docker-compose -f /tmp/niam.yml up -d
 echo "*****************************************************************************************"
 echo "The DB dump takes a long time to fully load, but incremental results should be visible"
 echo "*****************************************************************************************"
+echo "*****************************************************************************************"
+echo "Please update settings in /mnt/niam-shared/meteor-settings.json"
+echo "*****************************************************************************************"

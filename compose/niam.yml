@@ -1,6 +1,8 @@
 niam-c:
   container_name: niam-c
   image: niam
+  volumes:
+    - "/mnt/niam-shared:/shared"
   ports:
     - "80:3000"
   environment:

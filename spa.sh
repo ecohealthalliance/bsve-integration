@@ -14,7 +14,7 @@ if [ ! -f /shared/.aws/config ];then
   echo "The ProMED scraper requires you to place your AWS credentials in"
   echo "/shared/.aws/config so that they can be used within the Docker container."
   echo "The following command should do it if your user has an aws config file set up:"
-  echo "cp -r ~/.aws /shared"
+  echo "sudo mkdir -m 777 /shared && cp -r ~/.aws /shared"
   exit 1
 fi
 
@@ -27,7 +27,7 @@ if [[ ! -d promed_dump ]]; then
   aws s3 cp --recursive s3://promed-database/bsve/dump /mnt/mongo/dump
 fi
 #Load mongo dump
-docker exec -ti mongorestore --dir /mnt/mongo/dump
+docker exec -ti mongodb mongorestore --dir /var/lib/dump
 
 #Ensure we have a copy of the spa image
 if [[ ! -f spa.tar ]]; then
@@ -52,7 +52,7 @@ sed -r "s/\{\{ip_address\}\}/$LOCAL_IP/" compose/spa.yml > /tmp/spa.yml
 docker-compose -f /tmp/spa.yml up -d
 
 #Run cron script for testing
-docker exec -ti promed-scraper bash cronjob.sh
+#docker exec -ti promed-scraper bash cronjob.sh
 
 echo "*****************************************************************************************"
 echo "Please update settings in /shared/settings-production.json"
