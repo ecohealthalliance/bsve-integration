@@ -43,8 +43,17 @@ LOCAL_IP=$(ip -4 route get 8.8.8.8 | awk '{print $7}')
 sed -r "s/\{\{ip_address\}\}/$LOCAL_IP/" compose/niam.yml > /tmp/niam.yml
 docker-compose -f /tmp/niam.yml up -d
 
+#Setup up the settings json file
+echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > meteor-settings.json
+docker cp meteor-settings.json niam-c:/shared/meteor-settings.json
+
+#Restart niam container
+docker restart niam-c
+
 echo "*****************************************************************************************"
-echo "The DB dump takes a long time to fully load, but incremental results should be visible"
+echo "The DB dump takes a few hours to fully load, but incremental results should be visible"
+echo "Progress can be monitored with the following command:"
+echo 'sudo docker exec -it virtuoso-c isql-v 1111 dba dba exec="select * from DB.DBA.load_list;"'
 echo "*****************************************************************************************"
 echo "*****************************************************************************************"
 echo "Please update settings in /mnt/niam-shared/meteor-settings.json"
