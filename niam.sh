@@ -26,7 +26,7 @@ if [[ ! -f virtuoso.tar ]]; then
 fi
 
 #Downlod Virtuoso Dump
-virtuoso_data_path=/mnt/virtuoso
+virtuoso_data_path=/var/virtuoso
 if [[ ! -d $virtuoso_data_path/toLoad ]]; then
   mkdir -p $virtuoso_data_path/toLoad
   #TODO: Update dump
