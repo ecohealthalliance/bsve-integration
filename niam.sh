@@ -10,8 +10,8 @@ fi
 
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
-if [ $(df --output=avail | tail -n +2 | awk '{s+=$1} END {printf "%.0f", s/1024/1024}') -lt "70" ];then
-  echo "At least 70GB of hard drive space is required to load the full Virtuoso database"
+if [ $(df --output=avail | tail -n +2 | awk '{s+=$1} END {printf "%.0f", s/1024/1024}') -lt "100" ];then
+  echo "At least 100GB of hard drive space is required to load the full Virtuoso database"
   exit 1
 fi
 
@@ -30,7 +30,7 @@ virtuoso_data_path=/var/virtuoso
 if [[ ! -d $virtuoso_data_path/toLoad ]]; then
   mkdir -p $virtuoso_data_path/toLoad
   #TODO: Update dump
-  aws s3 cp --recursive s3://promed-database/sparql-annotation-database/virtuoso/dump_2016-07-15_15-27 $virtuoso_data_path/toLoad
+  aws s3 cp --recursive s3://promed-database/sparql-annotation-database/virtuoso/dump_2016-08-05_04-39 $virtuoso_data_path/toLoad
 fi
 
 #Load the images
