@@ -1,0 +1,21 @@
+niam-c:
+  container_name: niam-c
+  image: niam
+  volumes:
+    - "/mnt/niam-shared:/shared"
+  ports:
+    - "80:3000"
+  environment:
+    SPARQURL: "http://{{ip_address}}:8890/sparql?default-graph-uri=http://eha.io/t11"
+virtuoso-c:
+  container_name: virtuoso-c
+  image: virtuoso
+  volumes:
+    - /var/virtuoso:/data
+  ports:
+    - "8890:8890"
+    - "1111:1111"
+  environment:
+    DBA_PASSWORD: dba
+    SPARQL_UPDATE: "true"
+    DEFAULT_GRAPH: http://eha.io/t11
