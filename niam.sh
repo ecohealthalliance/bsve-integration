@@ -10,7 +10,12 @@ fi
 
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
-if [ $(df --output=avail | tail -n +2 | awk '{s+=$1} END {printf "%.0f", s/1024/1024}') -lt "100" ];then
+if [ $(free|grep 'Mem\|Swap'|awk '{s+=$2} END {printf "%.0f", s}') -lt "15000000" ]; then
+  echo "At least 15GB of combined RAM and Swap is required to load the Virtuoso database"
+  exit 1
+fi
+
+if [ $(df --output=avail | tail -n +2 | awk '{s+=$1} END {printf "%.0f", s/1024/1024}') -lt "100" ]; then
   echo "At least 100GB of hard drive space is required to load the full Virtuoso database"
   exit 1
 fi
