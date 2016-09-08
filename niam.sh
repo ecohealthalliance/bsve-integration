@@ -46,9 +46,8 @@ fi
 echo "Downloading Virtuoso DB..."
 mkdir -p /var/virtuoso
 aws s3 cp s3://promed-database/sparql-annotation-database/virtuoso/virtuoso.db.gz /var/virtuoso
-cd /var/virtuoso
 echo "Extracting Virtuoso DB..."
-gzip -d virtuoso.db.gz
+(cd /var/virtuoso && gzip -d virtuoso.db.gz)
 
 # Download Virtuoso Triple Dump
 # virtuoso_data_path=/var/virtuoso
