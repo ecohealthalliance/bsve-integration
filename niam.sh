@@ -25,6 +25,13 @@ if [ $(df --output=avail | tail -n +2 | awk '{s+=$1} END {printf "%.0f", s/1024/
   exit 1
 fi
 
+aws s3 ls s3://promed-database/sparql-annotation-database/virtuoso/ | grep virtuoso.db.gz
+if [ $? -ne 0 ];then
+  echo "The virtuoso DB dump could not be found on s3."
+  echo "You probably don't have permission to access to the bucket it is stored in."
+  exit 1
+fi
+
 #Ensure we have a copy of the niam and virtuoso images
 if [[ ! -f niam.tar ]]; then
   aws s3 cp s3://bsve-integration/niam.tar.gz niam.tar.gz
