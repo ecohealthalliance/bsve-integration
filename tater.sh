@@ -28,7 +28,6 @@ export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk
 wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/containers/bsve-tater/bsve --output-document=tater.yml
 sed -i "s/localhost/$LOCAL_IP/" tater.yml
 sed -i "s/8007/80/" tater.yml
-sed -i "s/  image\: tater/  image\: tater\:2016-04-06/" tater.yml
 
 #Instantiate a new grits container
 docker-compose -f tater.yml up -d
