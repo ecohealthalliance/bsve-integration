@@ -13,11 +13,9 @@ fi
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
 
-#Ensure we have a copy of the grits image
-if [[ ! -f tater.tar.gz && ! -f tater.tar ]]; then
-  aws s3 cp s3://bsve-integration/tater.tar.gz ./tater.tar.gz
-  gzip -d tater.tar.gz
-fi
+#Grab a copy of the tater image
+aws s3 cp s3://bsve-integration/tater.tar.gz ./tater.tar.gz
+gzip -d tater.tar.gz
 
 #Load the image
 docker load < tater.tar
