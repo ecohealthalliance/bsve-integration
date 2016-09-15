@@ -24,7 +24,7 @@ fi
 #Download and import ProMED mongo dump
 if [[ ! -d promed_dump ]]; then
   mkdir -p promed_dump
-  aws s3 cp --recursive s3://promed-database/bsve/dump /mnt/mongo/dump
+  aws s3 cp s3://promed-database/bsve/dump /mnt/mongo/dump --recursive
 fi
 #Load mongo dump
 docker exec -ti mongodb mongorestore --dir /var/lib/dump
