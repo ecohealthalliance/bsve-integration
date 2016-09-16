@@ -49,14 +49,6 @@ aws s3 cp s3://promed-database/sparql-annotation-database/virtuoso/virtuoso.db.g
 echo "Extracting Virtuoso DB..."
 (cd /var/virtuoso && gzip -d virtuoso.db.gz)
 
-# Download Virtuoso Triple Dump
-# virtuoso_data_path=/var/virtuoso
-# if [[ ! -d $virtuoso_data_path/toLoad ]]; then
-#   mkdir -p $virtuoso_data_path/toLoad
-#   #TODO: Update dump
-#   aws s3 cp --recursive s3://promed-database/sparql-annotation-database/virtuoso/dump_2016-08-05_04-39 $virtuoso_data_path/toLoad
-# fi
-
 #Load the images
 docker load < virtuoso.tar
 docker load < niam.tar
@@ -68,17 +60,16 @@ sed -r "s/\{\{ip_address\}\}/$LOCAL_IP/" compose/niam.yml > /tmp/niam.yml
 docker-compose -f /tmp/niam.yml up -d
 
 #Setup up the settings json file
-echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > meteor-settings.json
+echo '{"public": {"analyticsSettings": {} } }' > meteor-settings.json
 docker cp meteor-settings.json niam-c:/shared/meteor-settings.json
 
 #Restart niam container
 docker restart niam-c
 
-# echo "*****************************************************************************************"
-# echo "The Virtuoso DB dump will take a few hours to fully load, but incremental results may be visible"
-# echo "Progress can be monitored with the following command:"
-# echo 'sudo docker exec -it virtuoso-c isql-v 1111 dba dba exec="select * from DB.DBA.load_list;"'
-# echo "*****************************************************************************************"
-echo "*****************************************************************************************"
-echo "Please update settings in /mnt/niam-shared/meteor-settings.json"
-echo "*****************************************************************************************"
+#Start promed scraper if it is not running to keep the NIAM data up-to-date
+docker ps | grep promed-scraper
+if [ $? -ne 0 ]; then
+  ./promed-scraper.sh
+fi
+
+echo "Done"
