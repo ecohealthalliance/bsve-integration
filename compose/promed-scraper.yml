@@ -1,0 +1,11 @@
+promed-scraper:
+  container_name: promed-scraper
+  image: promed-scraper
+  environment:
+    - MONGO_URL={{ip_address}}:27017
+    - SPARQLDB_URL=http://{{ip_address}}:8890/sparql-auth?default-graph-uri=http://eha.io/t11
+    - OTHER_ANSIBLE_PARAMS="--tags=promed,download-classifier,t11 --skip-tags=preloadable"
+    - TERM=xterm
+  restart: always
+  volumes:
+    - /shared:/shared
