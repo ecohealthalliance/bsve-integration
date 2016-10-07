@@ -1,0 +1,14 @@
+geonames-api:
+  container_name: geonames-api
+  image: geonames-api
+  ports:
+    - "9200:9200"
+  restart: always
+elasticsearch:
+  container_name: elasticsearch
+  image: "elasticsearch:5"
+  environment:
+    - "ELASTICSEARCH_HOST=${ip_address}:9200"
+  restart: always
+  volumes:
+    - "${elasticsearch_data_path}:/usr/share/elasticsearch/data"
