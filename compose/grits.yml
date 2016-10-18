@@ -1,0 +1,11 @@
+grits:
+  image: grits
+  container_name: grits
+  ports:
+    - "3001:3001"
+    - "25:25"
+    - "80:80"
+    - "443:443"
+  restart: always
+  volumes:
+    - /etc/letsencrypt:/etc/letsencrypt
