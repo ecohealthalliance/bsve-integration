@@ -30,7 +30,7 @@ docker-compose -f compose/grits.yml up -d
 echo "Step 1:"
 echo "*****************************************************************************************"
 echo "In the grits container, please update all of the appropriate settings in /source-vars.sh"
-echo "HING: Look for CHANGEME"
+echo "HINT: Look for CHANGEME"
 echo ""
 echo ""
 echo "Step 2:"
