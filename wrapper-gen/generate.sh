@@ -1,4 +1,10 @@
 #!/bin/bash
+uname -s | grep -i linux
+if [ $? -ne 0 ];then
+  echo "Please run this script on Linux"
+  exit 1
+fi
+
 print_help_message () {
   echo "This script generates a zip file for a BSVE app."
   echo "$0 APP_URL APP_NAME ZIP_PATH"
