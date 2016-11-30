@@ -19,6 +19,9 @@ fi
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
 
+#Build and spin up redis
+./redis.sh --ethernet $ethernet
+
 #Import the geonames dataset
 ln -s $(pwd)/geonames.tar /var/log/geonames.tar
 cd /var/log/ && tar -xf geonames.tar &&\ 

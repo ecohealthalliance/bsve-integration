@@ -5,4 +5,4 @@
 mongodb/*
 **/settings-production.json
 **/settings-bsve.json
-
+redis/*

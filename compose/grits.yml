@@ -7,3 +7,21 @@ grits:
     - "80:80"
     - "443:443"
   restart: always
+
+redis:
+  image: redis
+  container_name: redis
+  ports:
+    - "6379:6379"
+  restart: always
+
+mongodb:
+  container_name: mongodb
+  image: mongodb
+  ports:
+    - "27017:27017"
+  restart: always
+  volumes:
+    - /mnt/mongo:/var/lib
+    - /var/log:/var/log
+
