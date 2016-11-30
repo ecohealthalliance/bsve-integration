@@ -16,5 +16,5 @@ cd redis
 wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/images/redis/Dockerfile
 
 docker build -t redis .
-docker-compose -f compose/grits.yml up -d redis
+docker-compose -f ../compose/grits.yml up -d redis
 
