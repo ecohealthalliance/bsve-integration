@@ -10,6 +10,8 @@ fi
 
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
+export REPO_ROOT=$(pwd)
+
 #Ensure data dump file is in our directory
 if [ ! -f grits-net-meteor.tar ]; then
   aws s3 cp s3://bsve-integration/grits-net-meteor.tar ./grits-net-meteor.tar
@@ -38,6 +40,7 @@ export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk
 sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" compose/flirt.yml
 
 #Instantiate a new flirt container
+cd $REPO_ROOT
 docker-compose -f compose/flirt.yml up -d
 
 #Setup up the settings json file
