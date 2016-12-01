@@ -13,6 +13,8 @@ flirt:
     - TERM=xterm
   ports:
     - "80:80"
+  volumes:
+    - /shared:/shared:ro
   restart: always
   command: supervisord --nodaemon --config /etc/supervisor/supervisord.conf
 
