@@ -38,7 +38,7 @@ docker load < grits.tar
 
 #Instantiate a new grits container
 cd $repo_dir &&\
-docker-compose -f compose/grits.yml up -d
+docker-compose -f compose/grits.yml up -d grits
 
 #Reusable function for executing inside of docker container
 function inside_container { docker exec -ti grits "$@"; }
