@@ -12,7 +12,7 @@ flirt:
     - PORT=80
     - TERM=xterm
   ports:
-    - "3000:3000"
+    - "80:80"
   restart: always
   command: supervisord --nodaemon --config /etc/supervisor/supervisord.conf
 
