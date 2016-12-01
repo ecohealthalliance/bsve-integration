@@ -1,0 +1,20 @@
+flirt:
+  container_name: flirt
+  image: flirt
+  environment:
+    - MONGO_URL=mongodb://10.0.0.134:27017/grits-net-meteor
+    - MONGO_URI=mongodb://10.0.0.134:27017
+    - MONGO_HOST=10.0.0.134
+    - MONGO_DB=grits-net-meteor
+    - MONGO_PORT=27017
+    - SIMULATION_PORT=45000
+    - ROOT_URL=http://52.23.65.236
+    - PORT=80
+    - TERM=xterm
+  ports:
+    - "80:80"
+  volumes:
+    - /shared:/shared:ro
+  restart: always
+  command: supervisord --nodaemon --config /etc/supervisor/supervisord.conf
+
