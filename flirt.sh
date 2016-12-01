@@ -35,13 +35,10 @@ docker load < flirt.tar
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 
 #Get and setup config files
-wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/containers/flirt.yml
-sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" flirt.yml
-sed -i "/  volumes\:/d" flirt.yml
-sed -i "/    \- \/shared\:\/shared\:ro/d" flirt.yml
+sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" compose/flirt.yml
 
 #Instantiate a new flirt container
-docker-compose -f flirt.yml up -d
+docker-compose -f compose/flirt.yml up -d
 
 #Setup up the settings json file
 echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json

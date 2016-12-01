@@ -14,7 +14,5 @@ flirt:
   ports:
     - "3000:3000"
   restart: always
-  volumes:
-    - /shared:/shared:ro
   command: supervisord --nodaemon --config /etc/supervisor/supervisord.conf
 
