@@ -35,12 +35,12 @@ fi
 docker load < flirt.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
+cd $REPO_ROOT
 
 #Get and setup config files
 sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" compose/flirt.yml
 
 #Instantiate a new flirt container
-cd $REPO_ROOT
 docker-compose -f compose/flirt.yml up -d
 
 #Setup up the settings json file
