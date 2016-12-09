@@ -60,6 +60,7 @@ export AWS_KEY=$(cat $AWS_CRED_FILE | grep aws_access_key_id | awk '{print $3}')
 export AWS_SECRET=$(cat $AWS_CRED_FILE | grep aws_secret_access_key | awk '{print $3}')
 inside_container sed -i "s/mongodb:\/\/CHANGEME/mongodb:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/redis:\/\/CHANGEME/redis:\/\/$LOCAL_IP/" /source-vars.sh
+inside_container sed -i "s/redis:\/\/CHANGEME/redis:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/http:\/\/CHANGEME/http:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/AWS_ACCESS_KEY_ID=CHANGEME/AWS_ACCESS_KEY_ID=$AWS_KEY/" /source-vars.sh
 inside_container sed -i "s/AWS_SECRET_ACCESS_KEY=CHANGEME/AWS_SECRET_ACCESS_KEY=$AWS_SECRET/" /source-vars.sh
