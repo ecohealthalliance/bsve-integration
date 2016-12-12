@@ -90,5 +90,5 @@ echo "Step 3: Restart the entire container"
 echo "*****************************************************************************************"
 echo ""
 echo ""
-echo "Grits app will be available at http://$LOCAL_IP/new?compact=true&bsveAccessKey=loremipsumhello714902&hideBackButton=true"
+echo "Grits app will be available at http://<hostname-or-ip>/new?compact=true&bsveAccessKey=loremipsumhello714902&hideBackButton=true"
 
