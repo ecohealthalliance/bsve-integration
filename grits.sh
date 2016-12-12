@@ -59,6 +59,7 @@ export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk
 inside_container sed -i "s/mongodb:\/\/CHANGEME/mongodb:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/redis:\/\/CHANGEME/redis:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/http:\/\/CHANGEME/http:\/\/$LOCAL_IP/" /source-vars.sh
+inside_container sed -i "/AWS/d" /source-vars.sh
 inside_container mkdir /root/.aws
 docker cp $AWS_CRED_FILE grits:/root/.aws/config
 
