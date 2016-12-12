@@ -56,13 +56,11 @@ export AWS_CRED_FILE
 
 #Configure settings
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
-export AWS_KEY=$(cat $AWS_CRED_FILE | grep aws_access_key_id | awk '{print $3}')
-export AWS_SECRET=$(cat $AWS_CRED_FILE | grep aws_secret_access_key | awk '{print $3}')
 inside_container sed -i "s/mongodb:\/\/CHANGEME/mongodb:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/redis:\/\/CHANGEME/redis:\/\/$LOCAL_IP/" /source-vars.sh
 inside_container sed -i "s/http:\/\/CHANGEME/http:\/\/$LOCAL_IP/" /source-vars.sh
-inside_container sed -i "s/AWS_ACCESS_KEY_ID=CHANGEME/AWS_ACCESS_KEY_ID=$AWS_KEY/" /source-vars.sh
-inside_container sed -i "s/AWS_SECRET_ACCESS_KEY=CHANGEME/AWS_SECRET_ACCESS_KEY=$AWS_SECRET/" /source-vars.sh
+inside_container mkdir /root/.aws
+docker cp $AWS_CRED_FILE grits:/root/.aws/config
 
 #Modify Apache config to be more compatible with BSVE hosting
 inside_container sed -i "1,7d" /etc/apache2/conf-enabled/proxy.conf
