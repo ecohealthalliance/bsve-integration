@@ -26,13 +26,14 @@ BSVE.init(function() {
   });
   //The dossierbar create handler will send a eha.dossierRequest message
   //to the child iframe and expect a eha.dossierTag message in response.
-  BSVE.ui.dossierbar.create(function(status, ctx){
+  BSVE.ui.dossierbar.create(function(status, ctx) {
     iframe.contentWindow.postMessage(JSON.stringify({type: "eha.dossierRequest"}), APP_HOST);
     var tagPromise = new Promise(function(resolve){
       window.addEventListener("message", function handler(event){
         if(event.origin !== APP_HOST) return;
+        var message;
         try {
-          var message = JSON.parse(event.data);
+          message = JSON.parse(event.data);
         } catch(e) {
           return;
         }
@@ -67,19 +68,30 @@ BSVE.init(function() {
   //to communicate directly with the BSVE API.
   window.addEventListener("message", function handler(event){
     if(event.origin !== APP_HOST) return;
+    var message;
     try {
-      var message = JSON.parse(event.data);
+      message = JSON.parse(event.data);
     } catch(e) {
       return;
     }
-    if(message.type === "eha.authRequest") {
-      var obj = {
-        type: "eha.authInfo",
-        user: BSVE.api.user(),
-        userData: BSVE.api.userData(),
-        authTicket: BSVE.api.authTicket()
-      };
-      iframe.contentWindow.postMessage(JSON.stringify(obj), APP_HOST);
+    switch(message.type) {
+      case "eha.authRequest":
+        var obj = {
+          type: "eha.authInfo",
+          user: BSVE.api.user(),
+          userData: BSVE.api.userData(),
+          authTicket: BSVE.api.authTicket()
+        };
+        iframe.contentWindow.postMessage(JSON.stringify(obj), APP_HOST);
+        break;
+      case "eha.alert":
+        var msg = message.msg || '';
+        var dismissable = message.dismissable || true;
+        var cb = message.cb || null;
+        BSVE.ui.alert(msg, dismissable, cb);
+        break;
+      default:
+        break;
     }
   }, false);
 });
