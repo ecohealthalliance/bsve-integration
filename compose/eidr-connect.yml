@@ -6,6 +6,7 @@ eidr-connect-bsve.eha.io:
     - ROOT_URL=https://eidr-connect.eha.io
     - PORT=3000
     - SPA_MONGO_URL=mongodb://10.0.0.63:27017/promed
+    - ONE_WAY_SYNC_URL=https://eidr-connect.eha.io
   env_file:
     - /shared/sensitive-environment-vars.env
   ports:
