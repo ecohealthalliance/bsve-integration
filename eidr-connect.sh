@@ -15,13 +15,6 @@ export REPO_ROOT=$(pwd)
 #Ensure data dump file is in our directory
 aws s3 cp s3://bsve-integration/spa-mongodump.tar ./spa-mongodump.tar 
 
-#Build and spin up our mongodb
-./mongodb.sh --ethernet $ethernet
-
-#Import the spa mongo data
-ln -s $(pwd)/spa-mongodump.tar /var/log/spa-mongodump.tar
-cd /var/log/ && tar -xf spa-mongodump.tar && docker exec -t mongodb mongorestore /var/log/dump
-
 #Include promed scraper
 cd $REPO_ROOT
 ./promed-scraper.sh --ethernet $ethernet
