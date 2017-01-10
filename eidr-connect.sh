@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#Preliminary cleanup in case of previous runs
+docker rm -f  eidr-connect-bsve.eha.io mongodb || true
+docker rmi eidr-connect mongodb || true
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -25,6 +29,7 @@ gzip -d eidr-connect.tar.gz
 
 #Load the image
 docker load < eidr-connect.tar
+rm eidr-connect.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 cd $REPO_ROOT
