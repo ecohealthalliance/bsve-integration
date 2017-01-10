@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#Preliminary cleanup in case of previous runs
+docker rm -f  birt mongodb || true
+docker rmi birt mongodb || true
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -11,9 +15,7 @@ fi
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Ensure data dump file is in our directory
-if [ ! -f birt-data.tar ]; then
-  aws s3 cp s3://bsve-integration/birt-data.tar.gz ./birt-data.tar.gz
-fi
+aws s3 cp s3://bsve-integration/birt-data.tar.gz ./birt-data.tar.gz
 
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
@@ -22,16 +24,16 @@ fi
 ln -s $(pwd)/birt-data.tar.gz /var/log/birt-data.tar.gz
 cd /var/log/ && tar -zxf birt-data.tar.gz &&\ 
 docker exec -t mongodb mongorestore --db birt /var/log/dump/birt
+rm -fr /var/log/dump
 cd -
 
 #Ensure we have a copy of the birt image
-if [[ ! -f birt.tar.gz && ! -f birt.tar ]]; then
-  aws s3 cp s3://bsve-integration/birt.tar.gz ./birt.tar.gz
-  gzip -d birt.tar.gz
-fi
+aws s3 cp s3://bsve-integration/birt.tar.gz ./birt.tar.gz
+gzip -d birt.tar.gz
 
 #Load the image
 docker load < birt.tar
+rm birt.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 
