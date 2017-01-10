@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Preliminary cleanup in case of previous runs
-docker rm -f  eidr-connect-bsve.eha.io mongodb || true
+docker rm -f  eidr-connect.eha.io mongodb || true
 docker rmi eidr-connect mongodb || true
 
 ethernet="eth0"
