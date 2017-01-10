@@ -1,5 +1,10 @@
 #!/bin/bash
 # This starts the promed-mail scraper and downloads data dumps of pre-processed promed articles.
+
+#Preliminary cleanup in case of previous runs
+docker rm -f  promed-scraper mongodb || true
+docker rmi promed-scraper mongodb || true
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -28,6 +33,7 @@ if [[ ! -f promed-scraper.tar ]]; then
 fi
 #Load the image
 docker load < promed-scraper.tar
+rm promed-scraper.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 
