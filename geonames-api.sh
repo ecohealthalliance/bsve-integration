@@ -16,6 +16,7 @@ aws s3 cp s3://bsve-integration/geonames-api.tar.gz /tmp/geonames-api.tar.gz
 tar -xvzf /tmp/elasticsearch-data.tar.gz -C /
 gzip -d /tmp/geonames-api.tar.gz
 docker load < /tmp/geonames-api.tar
+rm *.tar* /tmp/*.tar*
 
 (
   elasticsearch_data_path=/mnt/elasticsearch/data \
