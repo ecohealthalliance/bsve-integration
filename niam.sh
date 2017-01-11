@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#Preliminary cleanup in case of previous runs
+docker rm -f  niam-c virtuoso-c || true
+docker rmi birt niam virtuoso || true
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -33,14 +37,14 @@ if [ $? -ne 0 ];then
 fi
 
 #Ensure we have a copy of the niam and virtuoso images
-if [[ ! -f niam.tar ]]; then
-  aws s3 cp s3://bsve-integration/niam.tar.gz niam.tar.gz
-  gzip -d niam.tar.gz
-fi
-if [[ ! -f virtuoso.tar ]]; then
-  aws s3 cp s3://bsve-integration/virtuoso.tar.gz virtuoso.tar.gz
-  gzip -d virtuoso.tar.gz
-fi
+aws s3 cp s3://bsve-integration/niam.tar.gz niam.tar.gz
+gzip -d niam.tar.gz
+
+aws s3 cp s3://bsve-integration/virtuoso.tar.gz virtuoso.tar.gz
+gzip -d virtuoso.tar.gz
+
+#Clear out any preexisting dump data
+rm -fr /var/virtuoso || true
 
 # Download Raw Virtuoso DB dump
 echo "Downloading Virtuoso DB..."
@@ -52,6 +56,7 @@ echo "Extracting Virtuoso DB..."
 #Load the images
 docker load < virtuoso.tar
 docker load < niam.tar
+rm virtuoso.tar niam.tar
 
 LOCAL_IP=$(ip -4 route get 8.8.8.8 | awk '{print $7}')
 
