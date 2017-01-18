@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  birt mongodb || true
 docker rmi birt mongodb || true
+rm -fr *.tar* /var/log/dump
 
 ethernet="eth0"
 
