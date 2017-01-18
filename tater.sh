@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#Preliminary cleanup in case of previous runs
+docker rm -f  tater mongodb || true
+docker rmi tater mongodb || true
+rm *.tar*
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -19,6 +24,7 @@ gzip -d tater.tar.gz
 
 #Load the image
 docker load < tater.tar
+rm tater.tar*
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 

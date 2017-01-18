@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#Preliminary cleanup in case of previous runs
+docker rm -f  spa promed-scraper || true
+docker rmi spa promed-scraper || true
+rm *.tar*
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -17,12 +22,12 @@ if [ $? -ne 0 ]; then
 fi
 
 #Ensure we have a copy of the spa image
-if [[ ! -f spa.tar ]]; then
-  aws s3 cp s3://bsve-integration/spa.tar.gz ./spa.tar.gz
-  gzip -d spa.tar.gz
-fi
+aws s3 cp s3://bsve-integration/spa.tar.gz ./spa.tar.gz
+gzip -d spa.tar.gz
+
 #Load the image
 docker load < spa.tar
+rm spa.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 

@@ -1,5 +1,11 @@
 #!/bin/bash
 # This starts the promed-mail scraper and downloads data dumps of pre-processed promed articles.
+
+#Preliminary cleanup in case of previous runs
+docker rm -f  promed-scraper mongodb || true
+docker rmi promed-scraper mongodb || true
+rm *.tar*
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -14,20 +20,20 @@ fi
 ./mongodb.sh --ethernet $ethernet
 
 #Download and import ProMED mongo dump
-if [[ ! -d promed_dump ]]; then
-  mkdir -p promed_dump
-  aws s3 cp s3://promed-database/bsve/dump /mnt/mongo/dump --recursive
-fi
+mkdir -p promed_dump
+aws s3 cp s3://promed-database/bsve/dump /mnt/mongo/dump --recursive
+
 #Load mongo dump
 docker exec -ti mongodb mongorestore --dir /var/lib/dump
+rm -fr promed_dump
 
 #Ensure we have a copy of the promed scraper image
-if [[ ! -f promed-scraper.tar ]]; then
-  aws s3 cp s3://bsve-integration/promed-scraper.tar.gz ./promed-scraper.tar.gz
-  gzip -d promed-scraper.tar.gz
-fi
+aws s3 cp s3://bsve-integration/promed-scraper.tar.gz ./promed-scraper.tar.gz
+gzip -d promed-scraper.tar.gz
+
 #Load the image
 docker load < promed-scraper.tar
+rm promed-scraper.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 

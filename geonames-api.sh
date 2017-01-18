@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Prelim cleanup
+rm *.tar* /tmp/*.tar*
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -12,10 +15,10 @@ fi
 
 aws s3 cp s3://bsve-integration/elasticsearch-data.tar.gz /tmp/elasticsearch-data.tar.gz
 aws s3 cp s3://bsve-integration/geonames-api.tar.gz /tmp/geonames-api.tar.gz
-#mkdir -p /mnt/elasticsearch/data
 tar -xvzf /tmp/elasticsearch-data.tar.gz -C /
 gzip -d /tmp/geonames-api.tar.gz
 docker load < /tmp/geonames-api.tar
+rm *.tar* /tmp/*.tar*
 
 (
   elasticsearch_data_path=/mnt/elasticsearch/data \

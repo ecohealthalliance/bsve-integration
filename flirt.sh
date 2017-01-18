@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#Preliminary cleanup in case of previous runs
+docker rm -f  flirt mongodb || true
+docker rmi flirt mongodb || true
+rm -fr *.tar* /var/log/*.tar* /var/log/grits-net-meteor
+
 ethernet="eth0"
 
 if [[ $1 && $2 ]]; then
@@ -13,9 +18,7 @@ fi
 export REPO_ROOT=$(pwd)
 
 #Ensure data dump file is in our directory
-if [ ! -f grits-net-meteor.tar ]; then
-  aws s3 cp s3://bsve-integration/grits-net-meteor.tar ./grits-net-meteor.tar
-fi
+aws s3 cp s3://bsve-integration/grits-net-meteor.tar ./grits-net-meteor.tar
 
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
@@ -24,15 +27,15 @@ fi
 ln -s $(pwd)/grits-net-meteor.tar /var/log/grits-net-meteor.tar
 cd /var/log/ && tar -xf grits-net-meteor.tar &&\ 
 docker exec -t mongodb mongorestore --db grits-net-meteor /var/log/grits-net-meteor
+rm -fr /var/log/grits-net-meteor*
 
 #Ensure we have a copy of the flirt image
-if [[ ! -f flirt.tar.gz && ! -f flirt.tar ]]; then
-  aws s3 cp s3://bsve-integration/flirt.tar.gz ./flirt.tar.gz
-  gzip -d flirt.tar.gz
-fi
+aws s3 cp s3://bsve-integration/flirt.tar.gz ./flirt.tar.gz
+gzip -d flirt.tar.gz
 
 #Load the image
 docker load < flirt.tar
+rm flirt.tar
 
 export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk '{print $1}')
 cd $REPO_ROOT
