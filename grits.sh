@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  grits mongodb redis || true
 docker rmi grits mongodb redis || true
+rm -fr *.tar*  /var/log/*.tar* /var/log/geonames /var/log/mongodb
 
 ethernet="eth0"
 repo_dir=$(pwd)
