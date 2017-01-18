@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  tater mongodb || true
 docker rmi tater mongodb || true
+rm *.tar*
 
 ethernet="eth0"
 
