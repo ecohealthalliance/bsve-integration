@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  eidr-connect.eha.io mongodb || true
 docker rmi eidr-connect mongodb || true
+rm -fr *.tar*
 
 ethernet="eth0"
 
