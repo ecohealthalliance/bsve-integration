@@ -4,6 +4,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  promed-scraper mongodb || true
 docker rmi promed-scraper mongodb || true
+rm *.tar*
 
 ethernet="eth0"
 
