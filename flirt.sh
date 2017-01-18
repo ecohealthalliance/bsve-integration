@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  flirt mongodb || true
 docker rmi flirt mongodb || true
+rm -fr *.tar* /var/log/*.tar* /var/log/grits-net-meteor
 
 ethernet="eth0"
 
