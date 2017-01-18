@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  spa promed-scraper || true
 docker rmi spa promed-scraper || true
+rm *.tar*
 
 ethernet="eth0"
 
