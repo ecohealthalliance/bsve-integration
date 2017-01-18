@@ -3,6 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  niam-c virtuoso-c || true
 docker rmi birt niam virtuoso || true
+rm *.tar* 
 
 ethernet="eth0"
 
