@@ -10,6 +10,7 @@ sudo apt-get install zip
 #Note the extra url path required for GRITS
 ./generate.sh "https://*GRITS URL HERE*/new?compact=true&bsveAccessKey=loremipsumhello714902&hideBackButton=true" "GRITS" grits.zip 
 ./generate.sh https://*EIDR URL HERE* EIDR-Connect eidr-c.zip
+./generate.sh https://*EIDR URL HERE*/extract-incidents "EIDR-Connect Extract Incidents" eidr-c-extract.zip
 ./generate.sh https://*NIAM URL HERE* "Novel Infectious Agent Monitor;ProMED-mail" niam.zip
 ./generate.sh https://*FLIRT URL HERE* FLIRT flirt.zip
 ./generate.sh https://*SPA URL HERE* "SPA;ProMED-mail" spa.zip
