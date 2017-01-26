@@ -12,6 +12,8 @@ settings.ini
 USERNAME = <your email address>
 PASSWORD = <your password>
 URL = https://test.bsvecosystem.net/workbench/
+APP_NAME = <name of the bsve app>
+IFRAME_SRC = <src of the iframe>
 
 [SELENIUM]
 DRIVER = <one of Firefox, Chrome or PhantomJS>
