@@ -44,7 +44,7 @@ cd $repo_dir &&\
 docker-compose -f compose/grits.yml up -d grits
 
 #Reusable function for executing inside of docker container
-function inside_container { docker exec -t grits "$@"; }
+function inside_container { docker exec -i grits "$@"; }
 
 #Find the AWS credentials
 if [ -f ~/.aws/credentials ]; then
