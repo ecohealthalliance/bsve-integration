@@ -28,7 +28,7 @@ rm *.tar* /tmp/*.tar*
 
 echo "*****************************************************************************************"
 echo "To change the domain name in the the API documentation, edit the api config file, then regenerate the docs like so:"
-echo "docker exec -it geonames-api bash"
+echo "docker exec -i geonames-api bash"
 echo "vim apidoc.json"
 echo "npm run docs"
 echo "*****************************************************************************************"

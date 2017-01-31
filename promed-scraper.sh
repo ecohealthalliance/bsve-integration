@@ -24,7 +24,7 @@ mkdir -p promed_dump
 aws s3 cp s3://promed-database/bsve/dump /mnt/mongo/dump --recursive
 
 #Load mongo dump
-docker exec -ti mongodb mongorestore --dir /var/lib/dump
+docker exec -i mongodb mongorestore --dir /var/lib/dump
 rm -fr promed_dump
 
 #Ensure we have a copy of the promed scraper image

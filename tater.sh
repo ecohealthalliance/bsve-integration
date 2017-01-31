@@ -37,7 +37,7 @@ sed -i "s/8007/80/" tater.yml
 docker-compose -f tater.yml up -d
 
 #Settings json file
-docker exec -t tater mkdir /shared
+docker exec tater mkdir /shared
 wget https://raw.githubusercontent.com/ecohealthalliance/tater/master/settings-bsve.json
 docker cp settings-bsve.json tater:/shared/settings-production.json
 

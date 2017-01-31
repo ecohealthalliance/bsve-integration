@@ -26,7 +26,7 @@ aws s3 cp s3://bsve-integration/grits-net-meteor.tar ./grits-net-meteor.tar
 #Import the grits-net-meteor dataset
 ln -s $(pwd)/grits-net-meteor.tar /var/log/grits-net-meteor.tar
 cd /var/log/ && tar -xf grits-net-meteor.tar &&\ 
-docker exec -t mongodb mongorestore --db grits-net-meteor /var/log/grits-net-meteor
+docker exec mongodb mongorestore --db grits-net-meteor /var/log/grits-net-meteor
 rm -fr /var/log/grits-net-meteor*
 
 #Ensure we have a copy of the flirt image
@@ -48,7 +48,7 @@ docker-compose -f compose/flirt.yml up -d
 
 #Setup up the settings json file
 echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json
-docker exec -t flirt mkdir /shared
+docker exec flirt mkdir /shared
 docker cp settings-production.json flirt:/shared/settings-production.json
 
 #Restart flirt

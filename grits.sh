@@ -28,7 +28,7 @@ aws s3 cp s3://bsve-integration/geonames.tar ./geonames.tar
 #Import the geonames dataset
 ln -s $(pwd)/geonames.tar /var/log/geonames.tar
 cd /var/log/ && tar -xf geonames.tar &&\ 
-docker exec -t mongodb mongorestore --db geonames /var/log/geonames
+docker exec mongodb mongorestore --db geonames /var/log/geonames
 rm geonames.tar /var/log/geonames.tar
 
 #Ensure we have a copy of the grits image

@@ -24,7 +24,7 @@ aws s3 cp s3://bsve-integration/birt-data.tar.gz ./birt-data.tar.gz
 #Import the birt dataset
 ln -s $(pwd)/birt-data.tar.gz /var/log/birt-data.tar.gz
 cd /var/log/ && tar -zxf birt-data.tar.gz &&\ 
-docker exec -t mongodb mongorestore --db birt /var/log/dump/birt
+docker exec mongodb mongorestore --db birt /var/log/dump/birt
 rm -fr /var/log/dump
 cd -
 
@@ -46,7 +46,7 @@ docker-compose -f compose/birt.yml up -d birt
 
 ##Setup up the settings json file
 #echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json
-#docker exec -t birt mkdir /shared
+#docker exec birt mkdir /shared
 #docker cp settings-production.json birt:/shared/settings-production.json
 
 #Restart birt
