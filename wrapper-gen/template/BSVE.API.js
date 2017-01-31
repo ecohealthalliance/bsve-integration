@@ -22,20 +22,23 @@ var BSVE = BSVE || {};
 	 * @memberof BSVE
 	 * @alias BSVE.start
 	 */
-	ns.start = ns.init = function ns_init(callback)
+	ns.start = ns.init = function ns_init(callback, preventLoadingStyles)
 	{
 		if ( !_initializing )
 		{
 			_initializing = true;
 			_initCB = callback || null;
 			window.addEventListener( "message", messageHandler, false );
+			var l;
 
 			// load app styles
-			var l = document.createElement('link'),
-				 protocol = window.location.protocol;
-			l.rel="stylesheet";
-			l.href= protocol + "//developer.bsvecosystem.net/sdk/api/harbingerApp-1.0.css";
-			document.getElementsByTagName('head')[0].appendChild(l);
+			if ( !preventLoadingStyles || typeof(preventLoadingStyles) == 'undefined' ){
+				l = document.createElement('link'),
+				protocol = window.location.protocol;
+				l.rel="stylesheet";
+				l.href= protocol + "//developer.bsvecosystem.net/sdk/api/harbingerApp-1.0.css";
+				document.getElementsByTagName('head')[0].appendChild(l);
+			}
 			/*var l = document.createElement('link');
 			l.rel = "stylesheet";
 			l.href= window.top.location.origin + '/workbench/styles/harbingerApp.css';
@@ -102,6 +105,10 @@ var BSVE = BSVE || {};
 		return ns;
 	}
 
+
+/*********************************************
+ * Searchbar
+ ********************************************/
 	/**
 	 * @namespace BSVE.api.search
 	 * @memberof BSVE.api
@@ -252,7 +259,7 @@ var BSVE = BSVE || {};
 		var currentDate = new Date(),
 			defaultFromDate = new Date(),
 			_cDate = ns.api.dates.Mddyy(currentDate),
-			defaultFromDate = defaultFromDate.setDate(defaultFromDate.getDate() - 45),
+			defaultFromDate = defaultFromDate.setDate(defaultFromDate.getDate() - 6),
 			_fDate = ns.api.dates.Mddyy(defaultFromDate);
 
 		$('body').prepend('<div class="searchBar row-fluid">'+
@@ -481,7 +488,11 @@ var BSVE = BSVE || {};
 		var sbHeight = ( $('.searchBar').height() == 0 ) ? 400 : $('.searchBar').height();
 		$('.searchBar').css({top: -sbHeight + 'px'});
 	}
+//
 
+/*********************************************
+ * Dossier Bar & Item Tagging
+ ********************************************/
 	/**
 	 * Dossier control
 	 * @namespace BSVE.ui.dossierbar
@@ -510,8 +521,7 @@ var BSVE = BSVE || {};
 	{
 		var _dom = dom || $('body'),
 			timeoutID = -1,
-			customLayout = false,
-			events = [];
+			customLayout = false;
 
 		if (typeof(dom) != 'undefined')
 		{
@@ -523,7 +533,7 @@ var BSVE = BSVE || {};
 		$(_dom.selector + ' .tagger').remove();
 
 		_dom.prepend('<div class="tagger clearfix">'
-			+	'<div class="mousetrap">'
+			+	'<div class="mousetrap dossier-select">'
 			+		'<button class="drop-toggle btn flat"><span>Select a Dossier</span> <i class="fa fa-angle-down"></i></button>'
 			+		'<div class="drop-show" style="display:none;">'
 			+			'<div class="new-dossier">'
@@ -535,38 +545,58 @@ var BSVE = BSVE || {};
 			+			'<ul class="drop"></ul>'
 			+		'</div>'
 			+	'</div>'
-			+	'<div class="tags" style="display:none;">'
+			+	'<div class="tags" style="display:none; float: left; position:static;">'
 			+		'<button type="button" class="status-btn status-IOI" data-status="IOI"><i class="fa fa-thumbs-o-up"></i></button>'
 			+		'<button type="button" class="status-btn status-WCH" data-status="WCH"><i class="fa fa-eye"></i></button>'
 			+		'<button type="button" class="status-btn status-DRP" data-status="DRP"><i class="fa fa-thumbs-o-down"></i></button>'
+			+		'<span class="status-CMP" data-status="CMP"><i class="fa fa-file-text-o"></i></span>'
 			+	'</div>'
-			+ '<div class="events" style="display:none"></div>'
+			+	'<div class="mousetrap report-comps">'
+			+		'<button class="drop-toggle btn flat"><span>Select Report Components</span> <i class="fa fa-angle-down"></i></button>'
+			+		'<div class="drop-show" style="display:none;">'
+			+			'<input type="text" placeholder="Search" />'
+			+			'<i title="Clear Filter" style="display:none;" class="unstyled fa fa-times-circle clear-filter"></i>'
+			+			'<label><input type="checkbox" class="all" value="all"><span>Select All</span></label>'
+			+			'<div class="checks"></div>'
+			//+			'<button type="button" class="btn">Show All</button>'
+			+		'</div>'
+			+	'</div>'
+			// end dropdown
 			+'</div>');
 
 		if ( customLayout ){ $(_dom.selector + ' .tagger').addClass('custom'); }
 		if ( typeof(x) ) { $(_dom.selector + ' .tagger').css('left', x + 'px'); }
 		if ( typeof(y) ) { $(_dom.selector + ' .tagger').css('top', y + 'px'); }
 
-		$(_dom.selector + ' .tagger .status-btn').click(function()
-		{
-			if ( onTagged )
-			{
-				onTagged( $(this).attr('data-status'), $(this) );
-			}
-		});
 
-		$(_dom.selector + ' .tagger .events').on('click', 'span', function()
+		$(_dom.selector + ' .tagger:first .status-btn').click(function()
 		{
 			if ( onTagged )
 			{
-				onTagged( 'RPT:'+ $(this).attr('data-id'),  $(this));
+				// change button state here and not in the apps
+				if ( $(this).hasClass('active') )
+				{
+					// untag
+					var _id = $(this).attr('data-item-id');
+					if ( _id ){ ns.api.unTagItem(_id, null, $(this).attr('data-status')); }
+					$(this).removeClass('active');
+				}
+				else
+				{
+					//tag
+					onTagged( $(this).attr('data-status'), $(this) );
+					$(_dom.selector + ' .tagger .status-btn').removeClass('active');
+					$(this).addClass('active');
+					$(this).addClass('tagging');
+				}
 			}
 		});
 
 		$(_dom.selector + ' button.drop-toggle').click(function()
 		{
-			$(_dom.selector + ' .drop-show').toggle();
-			if ( $(_dom.selector + ' .drop-show').css('display') == 'block' )
+			var drop = $(this).parent().find('.drop-show');
+			drop.toggle();
+			if ( drop.css('display') == 'block' )
 			{
 				$(_dom.selector + ' .tagger').css('z-index', 101);
 			}
@@ -575,23 +605,30 @@ var BSVE = BSVE || {};
 				$(_dom.selector + ' .tagger').css('z-index', 100);
 			}
 		});
+
 		$(_dom.selector + ' .mousetrap').on({
 			mouseenter: function()
 			{
-				clearTimeout(timeoutID);
+				clearTimeout($(this).attr('data-timeoutID'));
+				$(this).removeAttr('data-timeoutID');
 			},
 			mouseleave: function()
 			{
-				timeoutID = setTimeout(function()
+				var _this = $(this);
+				var tID = setTimeout(function()
 				{
-					$(_dom.selector + ' .tagger').css('z-index', 100);
-					$('.drop-show').hide();
-
+					$(_dom.selector + ' .tagger:first').css('z-index', 100);
+					_this.find('.drop-show').hide();
 				}, 1000);
+
+				$(this).attr('data-timeoutID', tID);
 			}
 		});
 
-		$(_dom.selector + ' .tagger form').submit(function()
+		$(_dom.selector + ' .tagger:first form input').focus(function(){ $(this).parent().parent().addClass('focus'); });
+		$(_dom.selector + ' .tagger:first form input').blur(function(){ $(this).parent().parent().removeClass('focus'); });
+
+		$(_dom.selector + ' .tagger:first form').submit(function()
 		{
 			var val = $(this).find('input[type="text"]').val();
 			if ( val.length )
@@ -602,7 +639,172 @@ var BSVE = BSVE || {};
 			return false;
 		});
 
-		$(_dom.selector + ' .tagger .drop').on('click', 'li', function()
+		// comps
+		// search
+		$(_dom.selector + ' .report-comps:first input[type="text"]').on('input', function(){
+			var term = $(this).val();
+			if ( term == '' )
+			{
+				$(_dom.selector + ' .mousetrap.report-comps:first .checks label').show();
+				$(_dom.selector + ' input.all').parent().show();
+				$(_dom.selector + ' .clear-filter').hide();
+			}
+			else
+			{
+				$(_dom.selector + ' .mousetrap.report-comps:first .checks label').each(function()
+				{
+					var label = $(this).find('span').attr('title'),
+						reLower = new RegExp(term.toLowerCase(), 'g'),
+						reUpper = new RegExp(term.toUpperCase(), 'g');
+
+					if ( label.toLowerCase().indexOf(term.toLowerCase()) !== -1 )
+					{
+						var _label = label.replace(reLower, '<strong>' + term.toLowerCase() + '</strong>')
+						$(this).find('span').html(_label.replace(reUpper, '<strong>' + term.toUpperCase() + '</strong>'));
+						$(this).show();
+					}
+					else
+					{
+						$(this).hide();
+					}
+				});
+				$(_dom.selector + ' input.all').parent().hide();
+				$(_dom.selector + ' .clear-filter').show();
+			}
+		});
+
+		$(_dom.selector + ' .clear-filter').click(function()
+		{
+			$(_dom.selector + ' .report-comps:first input[type="text"]').val('').trigger('input');
+			return false;
+		});
+
+		// check box functionality
+		// select all
+		$(_dom.selector + ' .report-comps:first').on('change', 'input.all', function()
+		{
+			if ( $(this).prop('checked') )
+			{
+				var _ids = [];
+				$(this).parent().parent().find('.checks input').each(function()
+				{
+					if ( !$(this).hasClass('active')) { _ids.push($(this).val()); }
+				});
+
+				onTagged( _ids.join(','), $(this).parent().parent().find('.checks input') );
+				
+				$(this).parent().parent().find('.checks input').each(function()
+				{
+					if ( !$(this).hasClass('active')){ $(this).addClass('active');$(this).addClass('tagging'); }
+				});
+
+				// check all boxes
+				$(this).parent().parent().find('.checks input').prop('checked', 'checked');
+			}
+			else
+			{
+				$(this).parent().parent().find('.checks input').each(function()
+				{
+					if ( $(this).hasClass('active') )
+					{
+						var _id = $(this).attr('data-item-id');
+						if ( _id ){ ns.api.unTagItem(_id, null, $(this).val()); }
+						$(this).removeClass('active');
+					}
+				});
+
+				// uncheck all boxes
+				$(this).parent().parent().find('.checks input').prop('checked', false);
+			}
+
+			updateChecks();
+		});
+		$(_dom.selector + ' .report-comps:first .checks').on('change', 'input', function()
+		{
+			var id = $(this).val();
+			if ( $(this).hasClass('active') )
+			{
+				// untag
+				var _id = $(this).attr('data-item-id');
+				if ( _id ){ ns.api.unTagItem(_id, null, id); }
+				$(this).removeClass('active');
+				// deselect all
+				$(this).parent().parent().parent().find('input.all').prop('checked', false);
+			}
+			else
+			{
+				//tag
+				onTagged( $(this).val(), $(this) );
+				$(this).addClass('active');
+				$(this).addClass('tagging');
+
+				if ( $(_dom.selector + ' .report-comps:first .checks input.active').length == $(_dom.selector + ' .report-comps:first .checks input').length )
+				{
+					$(this).parent().parent().parent().find('input.all').prop('checked', 'checked');
+				}
+			}
+
+			updateChecks();
+		});
+
+		function updateChecks()
+		{
+			// sort
+			// 		selected sorted alpha at top
+			// 		unselected sorted alpha
+			var checksHolder = $(_dom.selector + ' .report-comps:first .checks'),
+				checks = checksHolder.children('label');
+			
+			checks.sort(function(a,b)
+			{
+				var an = $(a).find('input').val(),
+					bn = $(b).find('input').val();
+
+				if ( $(a).find('input').hasClass('active') && !$(b).find('input').hasClass('active') )
+				{
+					return -1
+				}
+				else if ( $(b).find('input').hasClass('active') && !$(a).find('input').hasClass('active') )
+				{
+					return 1;
+				}
+				else
+				{
+					if ( an > bn ) {
+						return 1;
+					}
+					if ( an < bn ) {
+						return -1;
+					}
+				}
+				
+				return 0;
+			});
+			checks.detach().appendTo(checksHolder);
+
+
+			// if any selected -> set status btn to active
+			var len = $(_dom.selector + ' .report-comps:first .checks').find('input.active').length;
+			if ( len > 0 )
+			{
+				$(_dom.selector + ' .status-CMP').addClass('active');
+				if ( len == 1 )
+				{
+					$(_dom.selector + ' .report-comps .drop-toggle span').html( $('.checks').find('input.active').parent().find('span').html() );
+				}
+				else
+				{
+					$(_dom.selector + ' .report-comps .drop-toggle span').html('Selections(' + len + ')');
+				}
+			}
+			else
+			{
+				$(_dom.selector + ' .status-CMP').removeClass('active');
+				$(_dom.selector + ' .report-comps .drop-toggle span').html('Select Report Components');
+			}
+		}
+
+		$(_dom.selector + ' .tagger:first .dossier-select .drop').on('click', 'li', function()
 		{
 			var _dossier = {
 				id:$(this).attr('data-id'),
@@ -610,28 +812,11 @@ var BSVE = BSVE || {};
 				permission:$(this).attr('data-permission')
 			};
 			$('.drop-show').hide();
-			$('.tagger .events, .tagger .tags').hide();
-			$('button.drop-toggle span').html(_dossier.name);
-			
-
-			$('.tagger .drop-toggle').attr('disabled', 'disabled').css('opacity', .6);
-			$('.tagger .events').addClass('disableEvents');
-
-			if ( $(this).attr('data-event-id') )
-			{
-				sendWorkbenchMessage('dossierSet', {id:_dossier.id, eventId: $(this).attr('data-event-id')});
-				var _html = '';
-				for ( i = 0; i < eventComponents.length; i++ )
-				{
-					_html += '<span data-id="' + eventComponents[i].id + '"><i class="fa fa-file-text-o"></i>' + eventComponents[i].label + '</span>';
-				}
-				$('.tagger .events').html(_html).show();
-			}
-			else
-			{
-				sendWorkbenchMessage('dossierSet', {id:_dossier.id});
-				$('.tagger .tags').show();
-			}
+			$('.tagger .tags').hide();
+			$('.dossier-select button.drop-toggle span').html(_dossier.name);
+			$('.tagger .dossier-select .drop-toggle').attr('disabled', 'disabled').css('opacity', .6);
+			sendWorkbenchMessage('dossierSet', {id:_dossier.id});
+			$('.tagger .tags').show();
 		});
 
 		if ( dossiers ){ updateDossierbar(dossiers); }
@@ -672,22 +857,31 @@ var BSVE = BSVE || {};
 		}
 	}
 
+	/**
+	 * Clears Dossier Bar of any tagged components. Useful when app state has changed and 
+	 * previous tagged content is no longer relevant.
+	 */
+	ns.ui.dossierbar.clear = function()
+	{
+		setDossier(dossiers[curDossier]);
+	}
 
 	/** @private */
 	var dossiers = [],
-		eventComponents = [
-			{"label":"Current Status","id":"CRC_CES"},
-			{"label":"Why We Are Reporting","id":"CRC_WRE"},
-			{"label":"Summary of Reports","id":"CRC_SRD"},
-			{"label":"References & Links","id":"CRC_RAL"}],
-		eventId = -1;
-	
+		curDossier = -1,
+		eventComponents = [];
+
 	// move filter functionality into this function
 	// also sorting
 	// may need to que this for when the dbar is built.
 	/** @private */
 	function updateDossierbar(data)
 	{
+		for ( var i = 0; i < data.length; i++ )
+		{
+			data[i].reportComponentTypes = eventComponents;
+		}
+
 		dossiers = data;
 		if ( typeof($) != 'undefined' )
 		{
@@ -698,22 +892,11 @@ var BSVE = BSVE || {};
 
 				if ( dossier.permission !== 'View' && !dossier.archived )
 				{
-					// if permission != View
-					// && not archived
 					_html += '<li data-name="'+ dossier.name +'" data-id="' + dossier.id + '" data-permission="' + dossier.permission + '">' + dossier.name + '</li>';
-
-					if ( dossier.dossierEvents )
-					{
-						for ( var j = 0; j < dossier.dossierEvents.length; j++ )
-						{
-							var ev = dossier.dossierEvents[j];
-							_html += '<li data-name="'+ dossier.name +'/'+ ev.name +'" data-id="' + dossier.id + 
-							'" data-event-id="' + ev.id + '" data-permission="' + dossier.permission + '">' + dossier.name + '/' + ev.name +'</li>';	
-						}
-					}
 				}
 			}
-			$('.tagger .drop').html(_html);
+			$('.tagger .dossier-select .drop').html(_html);
+			
 		}
 		else
 		{
@@ -724,53 +907,65 @@ var BSVE = BSVE || {};
 	function setDossier(data, event)
 	{
 		var selection = false;
+		var _currentSelectedDossier;
 		if ( data )
 		{
+			// for now match the dossier to the one in the the stored list
+			for ( var i = 0; i < dossiers.length; i++ )
+			{
+				if ( dossiers[i].id == data.id )
+				{
+					curDossier = i;
+					data = dossiers[i];
+				}
+			}
+
 			selection = ( data.archived || data.permission == 'View' ) ? false : true;
+			var _data;
+			for ( var i = 0; i < dossiers.length; i++ )
+			{
+				if ( data.id == dossiers[i].id ){
+					var _dossierName = data.name; 
+					_data = dossiers[i];  
+					_data.name = _dossierName;
+				}
+			}
+
+			// populate report components
+			var _comps = '';
+			for ( var i = 0; i < data.reportComponentTypes.length; i++ )
+			{
+				_comps += '<label><input type="checkbox" value="' + data.reportComponentTypes[i].id + '" /><span title="'+data.reportComponentTypes[i].label+'">' + data.reportComponentTypes[i].label + '</span></label>';
+			}
+			$('.mousetrap.report-comps .checks').html(_comps);
+			$('.mousetrap.report-comps .drop-toggle span').html('Select Report Components');
+			$('.mousetrap.report-comps input[type="text"]').val('');
+			$('.mousetrap.report-comps input.all').removeProp('checked');
+			$('.mousetrap.report-comps input.all').removeAttr('checked');
 		}
+		
 		$('.tagger .drop-toggle').removeAttr('disabled').css('opacity', 1);
-		$('.tagger .events, .tagger .tags').hide();
-		$('.tagger .tags button').removeClass('active');
-		$('.tagger .events').removeClass('disableEvents');
+		$('.tagger .tags').hide();
+		$('.mousetrap.report-comps').hide();
+
+		$('.tagger .tags button, .tagger .tags span').removeClass('active');
 		if ( selection )
 		{	
-			if ( event )
-			{
-				var ev, i = 0;
-				for ( i; i < data.dossierEvents.length; i++ )
-				{
-					if ( data.dossierEvents[i].id == event )
-					{
-						ev = data.dossierEvents[i];
-					}
-				}
-				// display name of event
-				if ( ev )
-				{
-					$('button.drop-toggle span').html(data.name + '/' + ev.name);
-					eventId = ev.id;
-
-					var _html = '';
-					for ( i = 0; i < eventComponents.length; i++ )
-					{
-						_html += '<span data-id="' + eventComponents[i].id + '"><i class="fa fa-file-text-o"></i>' + eventComponents[i].label + '</span>';
-					}
-
-					$('.tagger .events').html(_html).show();
-				}
-			}
-			else
-			{
-				$('button.drop-toggle span').html(data.name);
-				$('.tagger .tags').show();
-			}
+			$('.dossier-select button.drop-toggle span').html(_data.name);
+			$('.tagger .tags').show();
+			$('.mousetrap.report-comps').show();
+			_currentSelectedDossier = {dossier: _data};
 		}
 		else
 		{
-			$('button.drop-toggle span').html('Select a Dossier');
+			$('.dossier-select button.drop-toggle span').html('Select a Dossier');
+			$('.mousetrap.report-comps').hide();
+			_currentSelectedDossier = {dossier: null};
 		}
+			
+		if ( _currentSelectedDossier && _currentSelectedDossierAndEventBio ){ _currentSelectedDossierAndEventBio(_currentSelectedDossier); }
 	}
-
+	
 	/**
 	 * @param {object} item - object to save. The object signature is as follows: {
 		dataSource : name of data source used | string,
@@ -799,6 +994,11 @@ var BSVE = BSVE || {};
 		_itemUnTagCB = cb || null;
 		return ns;
 	}
+// End Dossier Bar and Item Tagging
+
+
+
+
 
 	/**
 	 * Returns the curently logged in user id.
@@ -819,6 +1019,15 @@ var BSVE = BSVE || {};
 		return ( !_initialized ) ? false : _userData;
 	}
 	/**
+	 * Returns the current App name.
+	 * @memberof BSVE.api
+	 * @alias BSVE.api.appName
+	 */
+	ns.api.appName = function()
+	{
+		return ( !_initialized ) ? false : _appName;
+	}
+	/**
 	 * Returns the curent auth ticket.
 	 * @memberof BSVE.api
 	 * @alias BSVE.api.authTicket
@@ -836,7 +1045,64 @@ var BSVE = BSVE || {};
 	{
 		return ( !_initialized ) ? false : _tenancy;
 	}
-
+	/**
+	 * Returns the search end point.
+	 * @memberof BSVE.api
+	 * @alias BSVE.api.searchAPIRoot
+	 */
+	ns.api.searchAPIRoot = function()
+	{
+		return ( !_initialized ) ? false : _searchAPIRoot;
+	}
+	/**
+	 * Returns the workbench end point.
+	 * @memberof BSVE.api
+	 * @alias BSVE.api.appRoot
+	 */
+	ns.api.appRoot = function()
+	{
+		return ( !_initialized ) ? false : _appRoot;
+	}
+	/**
+	 * Returns the statistics api end point.
+	 * @memberof BSVE.api
+	 * @alias BSVE.api.statisticsAPIRoot
+	 */
+	ns.api.statisticsAPIRoot = function()
+	{
+		return ( !_initialized ) ? false : _statisticsAPIRoot;
+	}
+	/**
+	 * Returns the web socket server end point.
+	 * @memberof BSVE.api
+	 * @alias BSVE.api.webSocketServerRoot
+	 */
+	ns.api.webSocketServerRoot = function()
+	{
+		return ( !_initialized ) ? false : _webSocketServerRoot;
+	}
+	/**
+	 * Returns the wordBank selected by user in the advancesearch.
+	 * @memberof BSVE.api
+	 * @alias BSVE.api.wordBank
+	 */
+	ns.api.wordBank = function()
+	{
+		return ( !_initialized ) ? false : _wordBank;
+	}
+	
+	ns.api.twitterDefaultDays = function()
+	{
+		return ( !_initialized ) ? false : _twitterDefaultDays;
+	}
+	ns.api.twitterMaxDays = function()
+	{
+		return ( !_initialized ) ? false : _twitterMaxDays;
+	}
+	ns.api.fedDefaultDays = function()
+	{
+		return ( !_initialized ) ? false : _fedDefaultDays;
+	}
 	/**
 	 * Generic Rest request function when the request is neither a data query or an analytic.
 	 * @param {string} url - The rest request url. The api will prepend the necessary server url. 
@@ -887,15 +1153,39 @@ var BSVE = BSVE || {};
 	{
 		_exchangeReceiveCB = callback;
 	}
+	
+	/** 
+	 * Get selected dossier id and event id
+	 * @namespace BSVE.api.dossier
+	 * @memberof BSVE.api
+	 */
+	ns.api.dossier = ns.api.dossier || {}
+	
+	/**
+	 * Executed when user has made any dossier dropdown change
+	 * @param {function} callback - Function to be exectuted once a dossier is selected.
+	 * @returns {object} BSVE root object
+	 * @memberof BSVE.api.dossier
+	 * @alias BSVE.api.dossier.update
+	 */
+	ns.api.dossier.update = function(callback)
+	{
+		_currentSelectedDossierAndEventBio = callback;
+	}
 
 	/**
 	 * Executed when another app has exchanged( shared ) data with this app.
 	 * @param {function} callback - Function to be exectuted once an exchange of data has been received.
+	 * @param {object} position - object to set position of exchange button. The object signature is as follows: {
+		top : The top position of the exchange button in relationship to the dom parent | number,
+		left : The left position of the exchange button in relationship to the dom parent | number
+	 }
+	 * @param {boolean} promise -  Weather or not "callback" function is a promised callback.
 	 * @returns {object} BSVE root object
 	 * @memberof BSVE.api.exchange
 	 * @alias BSVE.api.exchange.receive
 	 */
-	ns.api.exchange.send = function(callback, position)
+	ns.api.exchange.send = function(callback, position, promise)
 	{
 		_exchangeSendCB = callback;
 		var data = {
@@ -916,19 +1206,336 @@ var BSVE = BSVE || {};
 		}
 		$('.exchange-button button').click(function()
 		{
-			var _sendData = _exchangeSendCB();
-			if ( _sendData )
-			{
-				data.sendData = _sendData;
-				sendWorkbenchMessage( 'appsListDialog', data );
-			}
-			else
-			{
-				console.log('WARNING: Data Exchange attempted without providing exchange data in the BSVE.api.exchange.send() callback. Ensure that data is being returned from the exchange callback.');
+			if(promise){
+				_exchangeSendCB().then(function(data){
+					data.sendData = _sendData;
+					sendWorkbenchMessage( 'appsListDialog', data );
+				});
+			}else{
+				var _sendData = _exchangeSendCB();
+				if ( _sendData )
+				{
+					data.sendData = _sendData;
+					sendWorkbenchMessage( 'appsListDialog', data );
+				}
+				else
+				{
+					console.log('WARNING: Data Exchange attempted without providing exchange data in the BSVE.api.exchange.send() callback. Ensure that data is being returned from the exchange callback.');
+				}	
 			}
 		});
 	}
+	/*Call back for select/deselect disease list
+	*/
+	ns.api.favoriteDiseaseUpdate = function(callback)
+	{
+		_diseaseListUpdate = callback;
+	}
+	
+	/**
+	 * It will open a Model popup with a list of diseases with an option to select or deselct. 
+	 * Methode expect a list of diseases to show
+	 * List of disease - : ['disease1','disease2']  
+	 *@alias BSVE.api.openMyDiseaseList
+	*/
+	var tableData = [],
+		rawTableData = [],
+		perPage = 8,
+		curPage = 0,
+		numPages = 0,
+		tableLimit = 0,
+		tableSearchFilter = '',
+		sortFieldName = 'disease',
+		sortFieldReverse = true;
+	
+	ns.api.openMyDiseaseList = function (appDiseaseList) {
 
+		if(!appDiseaseList && appDiseaseList.length<=0){
+			console.log('This methode expect a list of diseases');
+			return false;
+		}
+		$.ajax({
+			url: _appRoot + '/api/user/favorite/disease/list',
+			data: { cache: false },
+			type: 'GET',
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader('harbinger-auth-ticket', _authTicket);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(errorThrown);
+			},
+			success: function (data, textStatus, jqXHR) {
+				var status = false;
+				if (data.data && data.data.length > 0) {
+					status = true;
+				}
+				var _appDiseaseList = getArrayOfDiseaseList(appDiseaseList, data.data, status);
+				openModelWindowForFullDiseaseList(_appDiseaseList);
+			}
+		});
+	}
+	function getArrayOfDiseaseList(appDiseaseList, favorite, status) {
+		var _tableData = [];
+		if (appDiseaseList && appDiseaseList.length > 0) {
+			if (status) {
+				for (var i = 0; i < appDiseaseList.length; i++) {
+					if (favorite.map(function (c) {
+						return c.toLowerCase();
+					}).indexOf(appDiseaseList[i].toLowerCase()) != -1) {
+						_tableData.push({ selected: true, disease: appDiseaseList[i] })
+					} else {
+						_tableData.push({ selected: false, disease: appDiseaseList[i] })
+					}
+				}
+			} else {
+				for (var i = 0; i < appDiseaseList.length; i++) {
+					_tableData.push({ selected: false, disease: appDiseaseList[i] })
+				}
+			}
+		}
+		return _tableData;
+	}
+	function openModelWindowForFullDiseaseList(masterDiseaseList) {
+		var _dom = $('body');
+
+		if (typeof (dom) != 'undefined') {
+			_dom = $(dom);
+		}
+
+		$(_dom.selector + ' #diseaseListModel').remove();
+		$(_dom.selector + ' .modal-backdrop').remove();
+
+		_dom.prepend('<div id="diseaseListModel" class="modal fade in">'
+			+ '<div class="modal-header">'
+			+ '<button type="button" class="close diseaseListClose">x</button>'
+			+ '<h3 id="myModalLabel">My Disease List</h3>'
+			+ '</div>'
+			+ '<div class="modal-body" style="overflow:hidden">'
+			+ '<p>Select Diseases from the list to track them in the BSVE Disease Signals App and other apps which will help you monitor specific diseases throughout the BSVE.</p>'
+			+ '<div class="diseaseListGrid"></div>'
+			+ '</div>'
+			+ '<div class="modal-footer">'
+			+ '<button class="btn diseaseListClose">Close</button>'
+			+ '</div>'
+			+ '</div>');
+
+		_dom.prepend('<div class="modal-backdrop fade in"></div>')
+
+		prependDiseaseListGrid(masterDiseaseList);
+
+		$('.diseaseListClose').click(function () {
+			$('#diseaseListModel').hide();
+			$(_dom.selector + ' .modal-backdrop').remove();
+		})
+	}
+	function prependDiseaseListGrid(diseaseList) {
+		$('.diseaseListGrid').prepend(
+			'<table class="table table-bordered table-hover tr-ng-grid">'
+			+ '<thead>'
+			+ '<tr>'
+			+ '<th width="25%">My Disease List</th>'
+			+ '<th width="75%">Disease'
+			+ '<div title="Sort" data-field-name="disease" class="tr-ng-sort">'
+			+ '<div class="tr-ng-sort-inactive tr-ng-sort-reverse">'
+			+ '<i class="fa fa-sort-down"></i>'
+			+ '<i class="fa fa-sort-up"></i>'
+			+ '<i class="fa fa-sort"></i>'
+			+ '</div>'
+			+ '</div>'
+			+ '</th>'
+			+ '</tr>'
+			+ '</thead>'
+			+ '<tfoot>'
+			+ '<tr>'
+			+ '<td colspan="999">'
+			+ '<div class="tr-ng-grid-footer form-inline">'
+			+ '<span class="pull-left form-group global-filter ng-scope">'
+			+ '<input class="form-control filterInput ng-pristine ng-valid" type="text" placeholder="Filter">'
+			+ '<i class="fa fa-filter filterIcon" style="margin-top:0px;"></i>'
+			+ '<button class="unstyled clear-field" style="display:none;">'
+			+ '<i class="fa fa-times-circle"></i>'
+			+ '</button>'
+			+ '</span>'
+			+ '<div class="pagination ng-scope">'
+			+ '<button type="button" class="btn prev" disabled="disabled">'
+			+ '<i class="fa fa-chevron-left"></i>'
+			+ '</button>'
+			+ '<span>1 - 5 of 100 </span>'
+			+ '<button type="button" class="btn next">'
+			+ '<i class="fa fa-chevron-right"></i>'
+			+ '</button>'
+			+ '</div>'
+			+ '</div>'
+			+ '</td>'
+			+ '</tr>'
+			+ '</tfoot>'
+			+ '<tbody></tbody>'
+			+ '</table>'
+		)
+		$('.diseaseListGrid table .filterInput').val('');
+		tableSearchFilter = '';
+		populateTable(diseaseList);
+	}
+
+	function populateTable(data) {
+		rawTableData = data;
+		curPage = 0;
+		sortFieldName = 'disease';
+		sortFieldReverse = true;
+		$('.diseaseListGrid .tr-ng-sort > div').removeClass('tr-ng-sort-active').removeClass('tr-ng-sort-reverse');
+		$('.diseaseListGrid .tr-ng-sort[data-field-name="' + sortFieldName + '"] > div').addClass('tr-ng-sort-active').addClass('tr-ng-sort-reverse');
+		updateTable();
+
+		// paginators
+		$('.diseaseListGrid .pagination button').unbind().bind('click', function () {
+			if ($(this).hasClass('next')) { curPage++; }
+			else if ($(this).hasClass('prev')) { curPage--; }
+			updateTable();
+			return false;
+		});
+
+		// search table
+		var toID = -1;
+		$('.diseaseListGrid table .filterInput').unbind().bind('change keydown paste', function (event) {
+			var t = $(this);
+			if (toID != -1) { clearTimeout(toID); }
+			toID = setTimeout(function () {
+				tableSearchFilter = t.val().toLowerCase();
+				curPage = 0;
+				updateTable();
+				if (t.val().length) { $('.diseaseListGrid table button.clear-field').show(); }
+				else { $('.diseaseListGrid table button.clear-field').hide(); }
+				toID = -1;
+			}, 500);
+		});
+
+		// clear search field button
+		$('.diseaseListGrid table button.clear-field').unbind().bind('click', function () {
+			$('.diseaseListGrid table .filterInput').val('');
+			tableSearchFilter = '';
+			curPage = 0;
+			updateTable();
+			$(this).hide();
+			return false;
+		});
+
+		// sorting
+		$('.diseaseListGrid .tr-ng-sort').unbind().bind('click', function () {
+			var d = $(this).find('div');
+			if (d.hasClass('tr-ng-sort-reverse')) {
+				d.removeClass('tr-ng-sort-reverse');
+			}
+			else {
+				d.addClass('tr-ng-sort-reverse');
+			}
+			sortFieldReverse = d.hasClass('tr-ng-sort-reverse');
+			sortFieldName = $(this).attr('data-field-name');
+
+			$('.diseaseListGrid .tr-ng-sort > div').removeClass('tr-ng-sort-active');
+			d.addClass('tr-ng-sort-active');
+
+			updateTable();
+
+			return false;
+		});
+	}
+	function updateTable() {
+		filterTableData();
+		var _html = '',
+			start = (curPage * perPage),
+			end = start + perPage;
+		tableLimit = tableData.length;
+		if (end > tableData.length) { end = tableData.length; }
+		for (i = start; i < end; i++) {
+			_html += '<tr>' +
+				'<td>' +
+				'<span style="padding-left:37px;"><input type="checkbox" class="diseaseCheckBox" data-disease="' + tableData[i].disease + '" data-select="' + tableData[i].selected + '"></input></span>' +
+				'</td>' +
+				'<td>' +
+				'<span style="display:block;" class="truncate" title="' + tableData[i].disease + '">' + tableData[i].disease + '</span>' +
+				'</td>' +
+				'</tr>';
+		}
+		$('.diseaseListGrid table tbody').html(_html);
+
+		if (curPage + 1 == numPages) { $('.diseaseListGrid .pagination button.next').attr('disabled', 'disabled'); }
+		if (curPage > 0) { $('.diseaseListGrid .pagination button.prev').removeAttr('disabled'); }
+		if (curPage - 1 == -1) { $('.diseaseListGrid .pagination button.prev').attr('disabled', 'disabled'); }
+		if (curPage < numPages - 1) { $('.diseaseListGrid .pagination button.next').removeAttr('disabled'); }
+
+		$('.diseaseListGrid table .pagination span').html((start + 1) + '-' + end + ' of ' + tableData.length);
+
+		$(".diseaseListGrid td span input[type=checkbox]").each(function () {
+			if ($(this).attr('data-select') == 'true') {
+				$(this).attr("checked", "checked");
+			}
+		});
+		$('.diseaseCheckBox').change(function () {
+			var _checked = $(this).is(":checked");
+			var _disease = $(this).attr('data-disease');
+			updateSelectedStatus(_disease,_checked);
+			makeDiseaseAsFavorite(_disease, _checked);
+		})
+	}
+	function updateSelectedStatus(disease,status)
+	{
+		for(var i=0;i<tableData.length;i++)
+		{
+			if(disease == tableData[i].disease){
+				tableData[i].selected = status;
+				break;
+			}
+		}		
+	}
+	function filterTableData() {
+
+		tableData = [];
+
+		for (var i = 0; i < rawTableData.length; i++) {
+			var _disease = rawTableData[i].disease;
+			if (_disease.toLowerCase().indexOf(tableSearchFilter) !== -1) {
+				tableData.push(rawTableData[i])
+			}
+		}
+
+		//sort
+		tableData.sort(function (a, b) {
+			if (b[sortFieldName] < a[sortFieldName]) return -1;
+			if (a[sortFieldName] < b[sortFieldName]) return 1;
+			return 0;
+		});
+		if (sortFieldReverse) { tableData.reverse(); }
+
+		numPages = Math.ceil(tableData.length / perPage);
+	}
+	function makeDiseaseAsFavorite(disease, status) {
+		var _data = {
+			"authTicket": '',
+			"data": {
+				"disease": disease,
+				"isFavorite": status
+			}
+		};
+		$.ajax({
+			url: _appRoot + "/api/user/favorite/disease/update",
+			type: 'POST',
+			data: JSON.stringify(_data),
+			contentType: 'application/json',
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader('harbinger-auth-ticket', _authTicket);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				if (typeof (errorCallback) == 'function') {
+					errorCallback(errorThrown);
+				}
+			},
+			success: function (data, textStatus, jqXHR) {
+				var data = [{ 'disease': _data.data.disease, 'checked': _data.data.isFavorite }]
+				if (_diseaseListUpdate) { _diseaseListUpdate(data) }
+			}
+		});
+
+	}
 	/** 
 	 * Data source retrieval
 	 * @namespace BSVE.api.datasource
@@ -1302,11 +1909,17 @@ var BSVE = BSVE || {};
 		_tenancy,
 		_authTicket,
 		_appRoot,
+		_appName,
 		_searchAPIRoot,
 		_analyticsAPIRoot,
 		_statisticsAPIRoot,
 		_app_id,
-		_app_launchType;
+		_wordBank,
+		_app_launchType,
+		_webSocketServerRoot,
+		_twitterDefaultDays,
+		_twitterMaxDays,
+		_fedDefaultDays;
 
 	// callbacks
 	var _initCB = null,
@@ -1314,7 +1927,9 @@ var BSVE = BSVE || {};
 		_searchCB = null,
 		_itemTagCB = null,
 		_itemUnTagCB = null,
-		_exchangeReceiveCB = null;
+		_exchangeReceiveCB = null,
+		_currentSelectedDossierAndEventBio = null,
+		_diseaseListUpdate = null;
 
 	/** @private */
 	function zeroPad(val)
@@ -1332,13 +1947,18 @@ var BSVE = BSVE || {};
 		_tenancy = data.tenancy;
 		_authTicket = data.authTicket;
 		_app_id = data.app_id; // not sure about this vs id
+		_appName = data.app_name; 
 		_app_launchType = data.launchType;
 		_initialized = true;
-
+		_wordBank = data.wordBank;
 		_appRoot = data.serviceRegistry['HARBINGER_API_WORKBENCH'];
 		_searchAPIRoot = data.serviceRegistry['HARBINGER_API_SEARCH'];
 		_analyticsAPIRoot = data.serviceRegistry['HARBINGER_API_ANALYTICS'];
 		_statisticsAPIRoot = data.serviceRegistry['HARBINGER_API_STATISTICS'];
+		_webSocketServerRoot = data.serviceRegistry['HARBINGER_WEBSOCKET_SERVER'];
+		_twitterDefaultDays=data.twitterDefaultDays;
+		_twitterMaxDays=data.twitterMaxDays;
+		_fedDefaultDays=data.fedDefaultDays;		
 
 		if ( _initCB ) _initCB();
 	}
@@ -1375,18 +1995,21 @@ var BSVE = BSVE || {};
 				case 'dossierSet':
 					setDossier(data.value);
 					break;
-				case 'dossierEventSet':
-					setDossier(data.value.dossier, data.value.event);
-					break;
 				case 'eventComponents':
-					//eventComponents = data.value; 
+					eventComponents = data.value.sort(function(a,b)
+					{
+						if ( a.label > b.label )
+						{
+							return 1;
+						}
+						if ( a.label < b.label )
+						{
+							return -1; 
+						}
+					});
 					break;
 				case 'dossierList':
 					updateDossierbar(data.value);
-					break;
-				case 'dossierItems':
-					//console.log('dossierItems', data.value);
-					// not sure why?
 					break;
 				case 'searchBox':
 					if ( _searchCB ) { toggleSearchbar(data.value ? 1 : -1); }
@@ -1403,14 +2026,18 @@ var BSVE = BSVE || {};
 				case 'itemComplete':
 					if ( data.value && _itemTagCB )
 					{
-						if ( data.value.data.dossierEventId )
+						for ( var i = 0; i < data.value.data.length; i++ )
 						{
-							_itemTagCB(data.value.data.itemId, data.value.data.dossierEventId, data.value.data.status);
+							// need to make sure it is the right one in the case of multiple selectios
+							$('.tagging').each(function()
+							{
+								if ( $(this).hasClass('status-btn') || data.value.data[i].status == $(this).val() )
+								{
+									$(this).attr('data-item-id', data.value.data[i].itemId).removeClass('tagging');
+								}
+							});
 						}
-						else
-						{
-							_itemTagCB(data.value.data.itemId);
-						}
+						_itemTagCB(data.value.data[0].itemId);
 					}
 					break;
 				case 'unTagItemComplete':
@@ -1425,8 +2052,14 @@ var BSVE = BSVE || {};
 						if ( _searchCB )
 						{
 							$('.searchBar #keyword').val(data.value.term);
-							$('#fromDP').val(ns.api.dates.Mddyy(data.value.startDate));
-							$("#toDP").val(ns.api.dates.Mddyy(data.value.endDate));
+							var _fDate = ns.api.dates.Mddyy(data.value.startDate);
+							var _toDate = ns.api.dates.Mddyy(data.value.endDate);
+							$('#fromDP').val(_fDate);
+							$("#toDP").val(_toDate);
+							$('#fromDP').data({date: _fDate}).datepicker('update').children("input").val(_fDate);
+							$('#toDP').data({date: _toDate}).datepicker('update').children("input").val(_toDate);
+							$('#fromDP').datepicker('setEndDate', _toDate);
+							$('#toDP').datepicker('setStartDate', _fDate);
 							_searchCB(data.value);
 						}
 						else
@@ -1446,8 +2079,19 @@ var BSVE = BSVE || {};
 					break;
 				case 'fedSearch':
 					_searchCB(data.value);
+					break;
 				case 'exchange':
 					if ( _exchangeReceiveCB ){ _exchangeReceiveCB(data.value); }
+					if(data.value && data.value.fromDate && data.value.toDate){
+						var _fDate = ns.api.dates.Mddyy(data.value.fromDate);
+						var _toDate = ns.api.dates.Mddyy(data.value.toDate);
+						$('#fromDP').val(_fDate);
+						$("#toDP").val(_toDate);
+						$('#fromDP').data({date: _fDate}).datepicker('update').children("input").val(_fDate);
+						$('#toDP').data({date: _toDate}).datepicker('update').children("input").val(_toDate);
+						$('#fromDP').datepicker('setEndDate', _toDate);
+						$('#toDP').datepicker('setStartDate', _fDate);
+					}
 					break;
 				default:
 					console.log('unknown type', data);
