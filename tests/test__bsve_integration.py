@@ -27,7 +27,8 @@ class test_BSVE_app_iframe(TestCase):
         # read the config file
         config = RawConfigParser()
         config.read(os.path.abspath(os.path.realpath(os.path.join(SCRIPT_DIR,'settings.ini'))))
-        self.url = config.get('BSVE', 'URL')
+        self.test_url = config.get('BSVE', 'TEST_URL')
+        self.developer_url = config.get('BSVE', 'DEVELOPER_URL')
         self.username = config.get('BSVE', 'USERNAME')
         self.password = config.get('BSVE', 'PASSWORD')
         self.app_name = config.get('BSVE', 'APP_NAME')
@@ -237,7 +238,7 @@ class test_BSVE_app_iframe(TestCase):
         # close the appdrawer
         self.click_element_when_visible('div.appdrawer')
 
-    def create_new_app(self):
+    def create_new_app_layout(self):
         self.find_new_layout_anchor('ul.dropdown-menu.layout-dropdown-menu')
         time.sleep(SLEEP)
         self.enter_text_by_id('newLayoutName', self.app_name)
@@ -261,7 +262,7 @@ class test_BSVE_app_iframe(TestCase):
             )
             self.driver.switch_to_frame(app_iframe)
             # TODO - determine if the app has loaded, possible add <div id="eha-app"> to all apps
-            # or some other methods of determining if the app has successfully loaded
+            # or some other method of determining if the app has successfully loaded
             # self.driver.find_element_by_id('eha-app')
             # return True
         except NoSuchElementException:
@@ -299,12 +300,51 @@ class test_BSVE_app_iframe(TestCase):
     def tearDown(self):
         pass
 
-    def test_login_page(self):
-        self.driver.get(self.url)
+    def bsve_login(self):
         self.enter_text_by_id('email', self.username)
         self.enter_text_by_id('password', self.password)
         # login
         self.click_element_when_visible('button.btn[type="submit"]')
+        time.sleep(SLEEP)
+
+    def find_app_row_in_table(self, selector):
+        table = self.find_when_element_is_visible(selector)
+        row = None
+        for tr in table.find_elements_by_tag_name('tr'):
+            for td in tr.find_elements_by_tag_name('td'):
+                title = td.get_attribute('title')
+                if title.lower().strip() == self.app_name.lower().strip():
+                    row = tr
+                    break
+            else:
+                continue
+            break
+        return row
+
+    def test_create_app(self):
+        self.driver.get(self.developer_url)
+        self.bsve_login()
+        # click BSVE Connect
+        self.click_element_when_visible('li#menu-item-1478 a')
+        row = self.find_app_row_in_table('div.projectDetailView[data-ng-show="appDetailTableView"] table.listTable')
+        if row:
+            trash_element = row.find_element_by_css_selector('i.fa-trash')
+            trash_element.click()
+            # confirm delete
+            confirm_button = self.find_when_element_is_visible('button.btn.btn-primary[ng-click="confirmDelete();"]')
+            print 'confirm_button: %s' % confirm_button
+            #button.click()
+        else:
+            # TODO: this needs finished, create the app using [Create New App] button
+            pass
+
+        time.sleep(SLEEP*10)
+        self.assertEqual(True, True)
+
+    def test_layout_page(self):
+        return
+        self.driver.get(self.test_url)
+        self.bsve_login()
 
         # open the layoutSelector and determine if this app_name exists in the list
         self.open_layout_selector()
@@ -314,8 +354,8 @@ class test_BSVE_app_iframe(TestCase):
             self.delete_existing_layout(list_element)
             time.sleep(SLEEP)
             self.open_layout_selector()
-            self.create_new_app()
+            self.create_new_app_layout()
         else:
             # create new app
-            self.create_new_app()
+            self.create_new_app_layout()
         self.assertEqual(True, self.verify_iframe_content())
