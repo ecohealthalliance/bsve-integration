@@ -15,4 +15,5 @@ sudo apt-get install zip
 ./generate.sh https://*FLIRT URL HERE* FLIRT flirt.zip
 ./generate.sh https://*SPA URL HERE* "SPA;ProMED-mail" spa.zip
 ./generate.sh https://*BIRT URL HERE* BIRT birt.zip
+./generate.sh https://*TATER URL HERE*/authenticate?userAccessKey=CHANGEME TATER tater.zip
 ```
