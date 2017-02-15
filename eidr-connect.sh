@@ -13,6 +13,7 @@ if [[ $1 && $2 ]]; then
   fi
 fi
 
+export MIN_RAM="2000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 export REPO_ROOT=$(pwd) 

@@ -11,6 +11,7 @@ if [[ $1 && $2 ]]; then
   fi
 fi
 
+export MIN_RAM="2000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 aws s3 cp s3://bsve-integration/elasticsearch-data.tar.gz /tmp/elasticsearch-data.tar.gz

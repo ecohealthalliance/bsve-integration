@@ -15,7 +15,13 @@ if [ "$EUID" -ne 0 ];then
   exit 1
 fi
 
-if [ $(free|grep Mem|awk '{print $2}') -lt "7500000" ];then
+if [[ $MIN_RAM ]]; then
+  RAM_REQUIREMENT=$MIN_RAM
+else
+  RAM_REQUIREMENT="7500000"
+fi
+
+if [ $(free|grep Mem|awk '{print $2}') -lt $RAM_REQUIREMENT ];then
   echo "At least 7.5GB of RAM is required"
   exit 1
 fi
