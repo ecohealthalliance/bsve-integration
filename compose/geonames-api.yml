@@ -4,7 +4,7 @@ geonames-api:
   environment:
     - "ELASTICSEARCH_HOST=${ip_address}:9200"
   ports:
-    - "80:80"
+    - "81:80"
   restart: always
 elasticsearch:
   container_name: elasticsearch
