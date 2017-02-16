@@ -13,6 +13,7 @@ if [[ $1 && $2 ]]; then
   fi
 fi
 
+export MIN_RAM="4000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Start promed scraper if it is not running

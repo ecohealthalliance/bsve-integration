@@ -2,7 +2,7 @@
 
 #Preliminary cleanup in case of previous runs
 docker rm -f  niam-c virtuoso-c || true
-docker rmi birt niam virtuoso || true
+docker rmi niam virtuoso || true
 rm *.tar* 
 
 ethernet="eth0"
@@ -13,6 +13,7 @@ if [[ $1 && $2 ]]; then
   fi
 fi
 
+export MIN_RAM="8000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 if [ "$(docker ps | grep virtuoso-c)" ]; then

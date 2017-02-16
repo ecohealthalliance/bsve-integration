@@ -13,6 +13,7 @@ if [[ $1 && $2 ]]; then
   fi
 fi
 
+export MIN_RAM="8000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Ensure data dump file is in our directory
