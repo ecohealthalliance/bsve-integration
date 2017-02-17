@@ -35,7 +35,7 @@ docker load < grits.tar
 rm grits.tar
 
 #Start geonames api
-./geonames-api.sh
+./geonames-api.sh --ethernet $ethernet
 
 #Instantiate a new grits container
 cd $repo_dir && (
