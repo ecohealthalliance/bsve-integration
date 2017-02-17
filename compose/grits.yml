@@ -6,6 +6,8 @@ grits:
     - "25:25"
     - "80:80"
     - "443:443"
+  environment:
+    - "GEONAME_LOOKUP_URL=http://${ip_address}:81/"
   restart: always
 
 redis:

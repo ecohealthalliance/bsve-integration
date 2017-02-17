@@ -26,11 +26,6 @@ aws s3 cp s3://bsve-integration/geonames.tar ./geonames.tar
 #Build and spin up redis
 ./redis.sh --ethernet $ethernet
 
-#Import the geonames dataset
-ln -s $(pwd)/geonames.tar /var/log/geonames.tar
-cd /var/log/ && tar -xf geonames.tar &&\ 
-docker exec mongodb mongorestore --db geonames /var/log/geonames
-rm geonames.tar /var/log/geonames.tar
 
 #Ensure we have a copy of the grits image
 aws s3 cp s3://bsve-integration/grits.tar.gz ./grits.tar.gz
@@ -40,9 +35,14 @@ gzip -d grits.tar.gz
 docker load < grits.tar
 rm grits.tar
 
+#Start geonames api
+./geonames-api.sh --ethernet $ethernet
+
 #Instantiate a new grits container
-cd $repo_dir &&\
-docker-compose -f compose/grits.yml up -d grits
+cd $repo_dir && (
+  ip_address=$(ip -4 route get 8.8.8.8 | awk '{print $7}') \
+  docker-compose -f compose/grits.yml up -d grits
+)
 
 #Reusable function for executing inside of docker container
 function inside_container { docker exec -i grits "$@"; }
