@@ -8,6 +8,7 @@ eidr-connect-bsve.eha.io:
     - SPA_MONGO_URL=mongodb://10.0.0.63:27017/promed
     - ONE_WAY_SYNC_URL=https://eidr-connect.eha.io
     - GRITS_URL=https://grits.bsvecosystem.net
+    - GRITS_API_KEY=CHANGEME
   env_file:
     - /shared/sensitive-environment-vars.env
   ports:
