@@ -8,6 +8,9 @@ grits:
     - "443:443"
   environment:
     - "GEONAME_LOOKUP_URL=http://${ip_address}:81/"
+    - "MONGO_URL=mongodb://${ip_address}:27017"
+    - "BROKER_URL=redis://${ip_address}:6379/0"
+    - "ROOT_URL=http://${ip_address}"
   restart: always
 
 redis:
