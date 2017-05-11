@@ -42,6 +42,7 @@ export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk
 sed -r "s/\{\{ip_address\}\}/$LOCAL_IP/" compose/promed-scraper.yml > /tmp/promed-scraper.yml
 docker-compose -f /tmp/promed-scraper.yml up -d
 
+export EXCLUDE_T11=true
 ./backfill-spa-niam.sh
 
 echo "*****************************************************************************************"
