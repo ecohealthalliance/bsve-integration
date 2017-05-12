@@ -12,10 +12,20 @@ database_dump_date=2016-7-20
 last_n_days=`dateutils.ddiff $database_dump_date now`
 extra_vars='max_items_to_process=-1 mongo_url=$MONGO_URL SPARQLDB_URL=$SPARQLDB_URL last_n_days='$last_n_days
 
-if [ $EXCLUDE_T11 == true ]; then
-  tags='promed,download-classifier'
+
+key="$1"
+if [ $key == "--exclude-t11" ];then
+  tags='promed,download-classifier';
+  echo "Excluding T11"
 else
   tags='promed,download-classifier,t11'
 fi
+
+#if [ $EXCLUDE_T11 == true ]; then
+#  tags='promed,download-classifier'
+#  echo "Excluding T11"
+#else
+#  tags='promed,download-classifier,t11'
+#fi
 
 docker exec -i promed-scraper bash -c "/usr/local/bin/ansible-playbook --connection=local /promed_mail_scraper/ansible/site.yml --tags=$tags --skip-tags=preloadable --extra-vars \"$extra_vars\""

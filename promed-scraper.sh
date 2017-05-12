@@ -42,8 +42,7 @@ export LOCAL_IP=$(ifconfig $ethernet|grep "inet addr"|awk -F":" '{print $2}'|awk
 sed -r "s/\{\{ip_address\}\}/$LOCAL_IP/" compose/promed-scraper.yml > /tmp/promed-scraper.yml
 docker-compose -f /tmp/promed-scraper.yml up -d
 
-export EXCLUDE_T11=true
-./backfill-spa-niam.sh
+./backfill-spa-niam.sh --exclude-t11
 
 echo "*****************************************************************************************"
 echo "In order to run the promed scraper against foreign language feeds you will need to have a valid Google Translate API key.  Once you have obtained this key, bash into the promed-mail docker container and set the 'google_api_key' value in the promed_mail_scraper/config.py file." 
