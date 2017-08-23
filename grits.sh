@@ -17,9 +17,6 @@ fi
 export MIN_RAM="7500000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
-#Ensure data dump file is in our directory
-aws s3 cp s3://bsve-integration/geonames.tar ./geonames.tar
-
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
 
@@ -34,9 +31,6 @@ gzip -d grits.tar.gz
 #Load the image
 docker load < grits.tar
 rm grits.tar
-
-#Start geonames api
-./geonames-api.sh --ethernet $ethernet
 
 #Instantiate a new grits container
 cd $repo_dir && (
