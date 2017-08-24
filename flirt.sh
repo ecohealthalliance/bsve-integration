@@ -47,21 +47,21 @@ sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" compose/flirt.yml
 docker-compose -f compose/flirt.yml up -d
 
 #Setup up the settings json file
-echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json
-docker exec flirt mkdir /shared
-docker cp settings-production.json flirt:/shared/settings-production.json
+#echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json
+#docker exec flirt mkdir /shared
+#docker cp settings-production.json flirt:/shared/settings-production.json
 
 #Restart flirt
-docker kill flirt
-docker start flirt
+#docker kill flirt
+#docker start flirt
 
-echo "*****************************************************************************************"
-echo "Please update settings in /shared/settings-production.json"
-echo "*****************************************************************************************"
-echo ""
-echo ""
-echo ""
-echo "*****************************************************************************************"
-echo "Please also not that the app may take serveral minutes to load depending on the amount of data in the database"
-echo "*****************************************************************************************"
+#echo "*****************************************************************************************"
+#echo "Please update settings in /shared/settings-production.json"
+#echo "*****************************************************************************************"
+#echo ""
+#echo ""
+#echo ""
+#echo "*****************************************************************************************"
+#echo "Please also not that the app may take serveral minutes to load depending on the amount of data in the database"
+#echo "*****************************************************************************************"
 
