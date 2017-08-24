@@ -16,7 +16,7 @@ export MIN_RAM="8000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Build and spin up our mongodb
-./mongodb.sh --ethernet $ethernet && sleep 30
+./mongodb.sh --ethernet $ethernet
 
 #Import mongodump if data is missing
 docker exec mongodb /usr/bin/mongo --quiet --eval "db.adminCommand('listDatabases')" | grep -i birt

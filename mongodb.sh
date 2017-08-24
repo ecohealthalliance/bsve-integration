@@ -19,3 +19,4 @@ docker load < mongodb.tar &&\
 #Start mongodb container
 docker-compose -f compose/mongodb.yml up -d
 
+sleep 60
