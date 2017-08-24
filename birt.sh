@@ -50,22 +50,3 @@ sed -i -r "s/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b/$LOCAL_IP/" compose/birt.yml
 #Instantiate a new birt container
 docker-compose -f compose/birt.yml up -d birt
 
-##Setup up the settings json file
-#echo '{"public": {"analyticsSettings": {"Google Analytics" : {"trackingId": "CHANGE-ME"} } } }' > settings-production.json
-#docker exec birt mkdir /shared
-#docker cp settings-production.json birt:/shared/settings-production.json
-
-#Restart birt
-#docker kill birt
-#docker start birt
-
-echo "*****************************************************************************************"
-echo "Please update settings in /shared/settings-production.json"
-echo "*****************************************************************************************"
-echo ""
-echo ""
-echo ""
-echo "*****************************************************************************************"
-echo "Please also not that the app may take serveral minutes to load depending on the amount of data in the database"
-echo "*****************************************************************************************"
-
