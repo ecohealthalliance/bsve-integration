@@ -1,0 +1,10 @@
+mongodb:
+  container_name: mongodb
+  image: mongodb
+  ports:
+    - "27017:27017"
+  restart: always
+  volumes:
+    - /mnt/mongo:/var/lib
+    - /var/log:/var/log
+

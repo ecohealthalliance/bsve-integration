@@ -11,14 +11,11 @@ fi
 export MIN_RAM="4000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
-mkdir mongodb
-cd mongodb
+#Import mongodb image
+aws s3 cp s3://bsve-integration/mongodb.tar.gz ./mongodb.tar.gz &&\
+gzip -d mongodb.tar.gz &&\
+docker load < mongodb.tar
 
-wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/images/mongodb/Dockerfile
-wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/images/mongodb/mongodb.conf
-wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/images/mongodb/run.sh
-wget https://raw.githubusercontent.com/ecohealthalliance/infrastructure/master/docker/containers/mongodb.yml
-
-docker build -t mongodb .
-docker-compose -f mongodb.yml up -d
+#Start mongodb container
+docker-compose -f compose/mongodb.yml up -d
 
