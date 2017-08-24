@@ -16,18 +16,24 @@ fi
 export MIN_RAM="8000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
-#Ensure data dump file is in our directory
-aws s3 cp s3://bsve-integration/birt-data.tar.gz ./birt-data.tar.gz
-
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
 
-#Import the birt dataset
-ln -s $(pwd)/birt-data.tar.gz /var/log/birt-data.tar.gz
-cd /var/log/ && tar -zxf birt-data.tar.gz &&\ 
-docker exec mongodb mongorestore --db birt /var/log/dump/birt
-rm -fr /var/log/dump
-cd -
+#Import mongodump if data is missing
+docker exec mongodb /usr/bin/mongo --quiet --eval "db.adminCommand('listDatabases')" | grep -i birt
+if [ $? -eq 1 ]; then
+
+  #Ensure data dump file is in our directory
+  aws s3 cp s3://bsve-integration/birt-data.tar.gz ./birt-data.tar.gz
+
+  #Import the birt dataset
+  ln -s $(pwd)/birt-data.tar.gz /var/log/birt-data.tar.gz
+  cd /var/log/ && tar -zxf birt-data.tar.gz &&\ 
+  docker exec mongodb mongorestore --db birt /var/log/dump/birt
+  rm -fr /var/log/dump
+  cd -
+
+fi
 
 #Ensure we have a copy of the birt image
 aws s3 cp s3://bsve-integration/birt.tar.gz ./birt.tar.gz
