@@ -14,7 +14,7 @@ export MIN_RAM="4000000"
 #Import mongodb image
 aws s3 cp s3://bsve-integration/mongodb.tar.gz ./mongodb.tar.gz &&\
 gzip -d mongodb.tar.gz &&\
-docker load < mongodb.tar
+docker load < mongodb.tar &&\
 
 #Start mongodb container
 docker-compose -f compose/mongodb.yml up -d
