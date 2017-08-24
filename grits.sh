@@ -3,7 +3,7 @@
 #Preliminary cleanup in case of previous runs
 docker rm -f  grits mongodb redis || true
 docker rmi grits mongodb redis || true
-rm -fr *.tar*  /var/log/*.tar* /var/log/geonames /var/log/mongodb
+rm -fr *.tar*  /var/log/*.tar* /var/log/mongodb
 
 ethernet="eth0"
 repo_dir=$(pwd)
@@ -16,9 +16,6 @@ fi
 
 export MIN_RAM="7500000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
-
-#Ensure data dump file is in our directory
-aws s3 cp s3://bsve-integration/geonames.tar ./geonames.tar
 
 #Build and spin up our mongodb
 ./mongodb.sh --ethernet $ethernet
