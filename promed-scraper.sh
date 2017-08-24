@@ -2,8 +2,7 @@
 # This starts the promed-mail scraper and downloads data dumps of pre-processed promed articles.
 
 #Preliminary cleanup in case of previous runs
-docker rm -f  promed-scraper mongodb || true
-docker rmi promed-scraper mongodb || true
+./nuke-everything.sh
 rm *.tar*
 
 ethernet="eth0"
