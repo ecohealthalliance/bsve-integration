@@ -2,7 +2,7 @@
 
 #Preliminary cleanup in case of previous runs
 ./nuke-everything.sh
-rm -fr *.tar* /var/log/dump
+rm -fr *.tar* /var/log/dump /var/log/birt-data.tar*
 
 ethernet="eth0"
 
@@ -16,7 +16,7 @@ export MIN_RAM="8000000"
 ./initial-checks.sh --ethernet $ethernet || exit 1
 
 #Build and spin up our mongodb
-./mongodb.sh --ethernet $ethernet
+./mongodb.sh --ethernet $ethernet && sleep 30
 
 #Import mongodump if data is missing
 docker exec mongodb /usr/bin/mongo --quiet --eval "db.adminCommand('listDatabases')" | grep -i birt
