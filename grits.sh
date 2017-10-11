@@ -60,11 +60,6 @@ inside_container sed -i "/AWS/d" /source-vars.sh
 inside_container mkdir /root/.aws
 docker cp $AWS_CRED_FILE grits:/root/.aws/config
 
-#Modify Apache config to be more compatible with BSVE hosting
-inside_container sed -i "1,7d" /etc/apache2/conf-enabled/proxy.conf
-inside_container sed -i "s/443/80/" /etc/apache2/conf-enabled/proxy.conf
-inside_container sed -i "/SSL/d" /etc/apache2/conf-enabled/proxy.conf
-
 #Run setup scripts
 inside_container bash -c "source /source-vars.sh && /scripts/update-settings.sh"
 inside_container bash -c "source /source-vars.sh && /scripts/disease-label-autocomplete.sh"
